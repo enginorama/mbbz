@@ -1,0 +1,30 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "./packages/web"
+		}
+	],
+	"settings": {
+		"remote.portsAttributes": {
+			"443": {
+				"protocol": "https"
+			},
+			"8443": {
+				"protocol": "https"
+			}
+		},
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"tailwindCSS.classFunctions": [
+			"cva",
+			"cx"
+		],
+		"files.associations": {
+			"*.css": "tailwindcss"
+		},
+		"scss.lint.unknownAtRules": "ignore",
+		"css.lint.unknownAtRules": "ignore",
+	},
+}
