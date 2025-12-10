@@ -28,7 +28,7 @@ export default defineConfigWithVueTs(
   ...pluginOxlint.configs['flat/recommended'],
   skipFormatting,
   {
-    files: ['src/pages/**/*.vue', 'src/modules/code/components/ui/**/*.vue'],
+    files: ['src/pages/**/*.vue', 'src/core/components/ui/**/*.vue'],
     rules: {
       'vue/multi-word-component-names': 'off',
     },

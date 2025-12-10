@@ -13,7 +13,9 @@
 				"esbenp.prettier-vscode",
 				"EditorConfig.EditorConfig",
 				"oxc.oxc-vscode",
-				"bradlc.vscode-tailwindcss"
+				"bradlc.vscode-tailwindcss",
+				"Gruntfuggly.todo-tree",
+				"Lokalise.i18n-ally"
 			]
 		}
 	}

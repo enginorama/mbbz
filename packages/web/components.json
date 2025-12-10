@@ -4,16 +4,16 @@
   "typescript": true,
   "tailwind": {
     "config": "",
-    "css": "src/styles/main.css",
+    "css": "src/styles/ui.css",
     "baseColor": "slate",
     "cssVariables": true,
     "prefix": ""
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/modules/core/components",
+    "components": "@/core/components",
     "utils": "@/lib/utils",
-    "ui": "@/modules/core/components/ui",
+    "ui": "@/core/components/ui",
     "lib": "@/lib",
     "composables": "@/composables"
   },

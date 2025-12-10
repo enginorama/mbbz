@@ -6,7 +6,8 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "eslint.config.*"
+    "eslint.config.*",
+    "./typed-router.d.ts"
   ],
   "compilerOptions": {
     "noEmit": true,

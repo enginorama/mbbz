@@ -1,9 +1,6 @@
 {
 	"folders": [
 		{
-			"path": "."
-		},
-		{
 			"path": "./packages/web"
 		}
 	],
@@ -26,5 +23,21 @@
 		},
 		"scss.lint.unknownAtRules": "ignore",
 		"css.lint.unknownAtRules": "ignore",
+		"editor.formatOnSave": true,
+		"i18n-ally.localesPaths": [
+			"packages/web/src/locales/"
+		],
+		"i18n-ally.enabledFrameworks": [
+			"vue"
+		],
+		"i18n-ally.extract.keyMaxLength": 200,
+		"i18n-ally.sortCompare": "locale",
+		"i18n-ally.sortKeys": true,
+		"i18n-ally.sortLocale": "en",
+		"i18n-ally.sourceLanguage": "en",
+		"i18n-ally.displayLanguage": "en",
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		},
 	},
 }
