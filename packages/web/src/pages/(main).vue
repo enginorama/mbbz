@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppSidebar from '@/core/components/sidebar/AppSidebar.vue';
 import SidebarProvider from '@/core/components/ui/sidebar/SidebarProvider.vue';
+import { Toaster } from 'vue-sonner';
 </script>
 
 <template>
@@ -9,5 +10,6 @@ import SidebarProvider from '@/core/components/ui/sidebar/SidebarProvider.vue';
     <main class="p-6">
       <RouterView />
     </main>
+    <Toaster />
   </SidebarProvider>
 </template>

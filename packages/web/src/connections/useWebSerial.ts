@@ -35,7 +35,7 @@ export function useWebSerial(callback: (msg: string) => void) {
       port = autoConnectPort ?? (await navigator.serial.requestPort());
     } catch (e) {
       console.error('Web Serial port request error:', e);
-      return false;
+      throw e;
     }
 
     await port.open({

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Avatar, AvatarFallback, AvatarImage } from '@/core/components/ui/avatar';
+import { useWebSerial } from '@/connections/useWebSerial';
+import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,15 +15,33 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/core/components/ui/sidebar';
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-vue-next';
+import { useEventBus, type EventBusKey } from '@vueuse/core';
+import { CableIcon, ChevronsUpDown, LogsIcon, SettingsIcon, UnplugIcon } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { toast } from 'vue-sonner';
 
 const { isMobile } = useSidebar();
 
-const connection = {
-  status: 'disconnected',
+const fooKey: EventBusKey<string> = Symbol('symbol-key');
+const bus = useEventBus(fooKey);
+
+const { open, close, connected } = useWebSerial((msg) => bus.emit(msg));
+
+async function tryToOpenConnection() {
+  try {
+    await open();
+  } catch (e) {
+    toast.error('Failed to open port');
+    console.error('gna');
+    console.error(e);
+  }
+}
+
+const connection = computed(() => ({
+  status: connected.value ? 'connected' : 'disconnected',
   protocol: 'dcc-ex',
   type: 'Serial',
-};
+}));
 </script>
 <template>
   <SidebarMenu>
@@ -34,8 +53,7 @@ const connection = {
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarImage src="" alt="DCC" />
-              <AvatarFallback class="rounded-lg"> CN </AvatarFallback>
+              <AvatarFallback class="rounded-lg"><UnplugIcon /></AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-medium">{{ connection.type }}</span>
@@ -50,31 +68,31 @@ const connection = {
           align="end"
           :side-offset="4"
         >
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Sparkles />
-              Upgrade to Pro
+          <DropdownMenuGroup v-if="!connected">
+            <DropdownMenuItem as-child>
+              <SidebarMenuButton @click="tryToOpenConnection">
+                <CableIcon />
+                Connect
+              </SidebarMenuButton>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <BadgeCheck />
-              Account
+              <LogsIcon />
+              Logs
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <CreditCard />
-              Billing
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell />
-              Notifications
+              <SettingsIcon />
+              Config
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <LogOut />
-            Log out
+          <DropdownMenuSeparator v-if="connected" />
+          <DropdownMenuItem v-if="connected" as-child>
+            <SidebarMenuButton @click="close">
+              <CableIcon />
+              Disconnect
+            </SidebarMenuButton>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
