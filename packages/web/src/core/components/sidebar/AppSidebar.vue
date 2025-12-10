@@ -4,7 +4,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -37,14 +36,13 @@ import ConnectionWidget from './ConnectionWidget.vue';
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
-        <SidebarGroupLabel>Application</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild size="lg">
                 <RouterLink :to="{ name: '/(main)' }" class="flex items-center gap-2">
                   <HomeIcon />
-                  <span>Start</span>
+                  <span>{{ $t('sidebar.start') }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -52,7 +50,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               <SidebarMenuButton asChild size="lg">
                 <RouterLink :to="{ name: '/(main)/throttle' }" class="flex items-center gap-2">
                   <HomeIcon />
-                  <span>Throttle</span>
+                  <span>{{ $t('sidebar.throttle') }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -60,7 +58,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               <SidebarMenuButton asChild size="lg">
                 <RouterLink to="/cabs" class="flex items-center gap-2">
                   <HomeIcon />
-                  <span>Cabs</span>
+                  <span>{{ $t('sidebar.cabs') }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -68,7 +66,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               <SidebarMenuButton asChild size="lg">
                 <RouterLink to="/turnouts" class="flex items-center gap-2">
                   <HomeIcon />
-                  <span>Turnouts</span>
+                  <span>{{ $t('sidebar.turnouts') }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -84,7 +82,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               <SidebarMenuButton asChild size="lg">
                 <RouterLink to="/turnouts" class="flex items-center gap-2">
                   <HomeIcon />
-                  <span>Maintenance</span>
+                  <span>{{ $t('sidebar.maintenance') }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>

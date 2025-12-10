@@ -1,0 +1,10 @@
+{
+  "sidebar": {
+    "cabs": "Cabs",
+    "maintenance": "Maintenance",
+    "sensors": "Sensors",
+    "start": "Start",
+    "throttle": "Throttle",
+    "turnouts": "Turnouts"
+  }
+}

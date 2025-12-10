@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-vue-next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/core/components/ui/avatar';
 import {
   DropdownMenu,
@@ -15,6 +14,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/core/components/ui/sidebar';
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-vue-next';
 
 const { isMobile } = useSidebar();
 
