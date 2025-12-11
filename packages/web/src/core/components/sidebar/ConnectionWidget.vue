@@ -25,7 +25,10 @@ const { isMobile } = useSidebar();
 const fooKey: EventBusKey<string> = Symbol('symbol-key');
 const bus = useEventBus(fooKey);
 
-const { open, close, connected } = useWebSerial((msg) => bus.emit(msg));
+const { open, close, connected } = useWebSerial((msg) => {
+  bus.emit(msg);
+  console.log(msg);
+});
 
 async function tryToOpenConnection() {
   try {

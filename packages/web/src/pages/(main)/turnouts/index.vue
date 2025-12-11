@@ -1,3 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import PageTitle from '@/core/components/PageTitle.vue';
+</script>
 
-<template>Turnouts</template>
+<template>
+  <PageTitle title="Turnouts" subtitle="Manage your track switches" />
+</template>

@@ -10,6 +10,6 @@ import { Toaster } from 'vue-sonner';
     <main class="p-6">
       <RouterView />
     </main>
-    <Toaster />
+    <Toaster :rich-colors="true" />
   </SidebarProvider>
 </template>

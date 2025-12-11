@@ -1,6 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import PageTitle from '@/core/components/PageTitle.vue';
+</script>
 
 <template>
-  <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">Cabs</h1>
-  <p class="text-muted-foreground text-sm">Manage your rolling stock</p>
+  <PageTitle title="Cabs" subtitle="Manage your rolling stock" />
 </template>
