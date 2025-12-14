@@ -9,9 +9,8 @@ const props = defineProps<{
 
 <template>
   <div
-    data-slot="sidebar-group-content"
-    data-sidebar="group-content"
-    :class="cn('w-full text-sm', props.class)"
+    data-slot="card-action"
+    :class="cn('col-start-2 row-span-2 row-start-1 self-start justify-self-end', props.class)"
   >
     <slot />
   </div>

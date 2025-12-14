@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './ui.css';
+@import './shadcn.css';
 @import 'vue-sonner/style.css';
 
 body {
