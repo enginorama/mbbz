@@ -47,9 +47,9 @@ import ConnectionWidget from './ConnectionWidget.vue';
     <SidebarContent>
       <SidebarGroup>
         <SidebarGroupContent>
-          <SidebarMenu>
+          <SidebarMenu class="gap-3">
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
+              <SidebarMenuButton as-child>
                 <RouterLink :to="{ name: '/(main)' }" class="flex items-center gap-2">
                   <HomeIcon />
                   <span>{{ $t('sidebar.start') }}</span>
@@ -57,7 +57,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
+              <SidebarMenuButton as-child>
                 <RouterLink :to="{ name: '/(main)/throttle' }" class="flex items-center gap-2">
                   <GaugeIcon />
                   <span>{{ $t('sidebar.throttle') }}</span>
@@ -65,7 +65,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
+              <SidebarMenuButton as-child>
                 <RouterLink to="/cabs" class="flex items-center gap-2">
                   <TrainFrontIcon />
                   <span>{{ $t('sidebar.cabs') }}</span>
@@ -73,7 +73,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
+              <SidebarMenuButton as-child>
                 <RouterLink to="/turnouts" class="flex items-center gap-2">
                   <SplitIcon />
                   <span>{{ $t('sidebar.turnouts') }}</span>
@@ -81,7 +81,7 @@ import ConnectionWidget from './ConnectionWidget.vue';
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
+              <SidebarMenuButton as-child>
                 <RouterLink to="/turnouts" class="flex items-center gap-2">
                   <GamepadDirectionalIcon />
                   <span>{{ $t('sidebar.sensors') }}</span>
@@ -89,10 +89,10 @@ import ConnectionWidget from './ConnectionWidget.vue';
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink to="/turnouts" class="flex items-center gap-2">
+              <SidebarMenuButton as-child>
+                <RouterLink :to="{ name: '/(main)/cvs' }" class="flex items-center gap-2">
                   <MemoryStickIcon />
-                  <span>{{ $t('sidebar.maintenance') }}</span>
+                  <span>{{ $t('sidebar.cvs') }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>

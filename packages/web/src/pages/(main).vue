@@ -7,7 +7,7 @@ import { Toaster } from 'vue-sonner';
 <template>
   <SidebarProvider style="--sidebar-width: 16rem; --sidebar-width-mobile: 18rem">
     <AppSidebar />
-    <main class="p-6">
+    <main class="w-full p-6">
       <RouterView />
     </main>
     <Toaster :rich-colors="true" />
