@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { rawInputBus, rawOutputBus, useDccInputBus } from '@/connections/connections';
 import { useWebSerial } from '@/connections/useWebSerial';
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import {
@@ -15,19 +16,31 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/core/components/ui/sidebar';
-import { useEventBus, type EventBusKey } from '@vueuse/core';
+import { parseDccExString } from '@/protocols/DccEx';
+import { useEventBus } from '@vueuse/core';
 import { CableIcon, ChevronsUpDown, LogsIcon, SettingsIcon, UnplugIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { toast } from 'vue-sonner';
 
 const { isMobile } = useSidebar();
 
-const fooKey: EventBusKey<string> = Symbol('symbol-key');
-const bus = useEventBus(fooKey);
+const bus = useEventBus(rawInputBus);
+const dccInputBus = useDccInputBus();
 
-const { open, close, connected } = useWebSerial((msg) => {
+const { open, close, connected, writeToStream } = useWebSerial((msg) => {
   bus.emit(msg);
+  const packets = parseDccExString(msg);
+  packets.forEach((packet) => {
+    dccInputBus.emit(packet);
+  });
   console.log(msg);
+});
+
+const outputBus = useEventBus<string>(rawOutputBus);
+outputBus.on((msg) => {
+  if (connected.value) {
+    writeToStream(msg);
+  }
 });
 
 async function tryToOpenConnection() {

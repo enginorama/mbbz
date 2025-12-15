@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
-import { useAppDialog } from '@/core/dialogs/useAppDialog';
 import CvCard from '@/cvs/CvCard.vue';
+import { useCvStore } from '@/stores/useCvStore';
 import { PlusIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
-const cvs = ref(new Set<number>([1, 8, 29]));
+const cvs = ref(new Set<number>([1, 8, 29, 5, 6]));
 
-const cvValues = ref(new Map<number, { value: number | undefined; fetching: boolean }>());
+const cvStore = useCvStore();
+const cvValues = computed(() => cvStore.cvValues);
+// const cvValues = ref(new Map<number, { value: number | undefined; fetching: boolean }>());
 
 const sortedCvs = computed(() => {
   return Array.from(cvs.value)
@@ -18,28 +20,17 @@ const sortedCvs = computed(() => {
       return {
         address,
         title: `CV ${address}`,
-        value: address + 5,
+        value: cvValue,
       };
     });
 });
 
-const { show } = useAppDialog();
-
-const test = ref(false);
-const counter = ref(0);
-
 async function removeCv(address: number) {
-  // test.value = false;
-  // const dialogreturn = await show(AppDialog, () => ({
-  //   show: test.value,
-  //   title: `CV ${address} löschen? ${counter.value}`,
-  // }));
-  // console.log('Dialog returned:', dialogreturn);
-  // console.log('Removing CV at address:', address);
-  // setTimeout(() => {
-  //   counter.value += 1;
-  // }, 1000);
-  // cvs.value.delete(address);
+  cvs.value.delete(address);
+}
+
+async function refreshCv(address: number) {
+  await cvStore.readCv(address);
 }
 </script>
 
@@ -55,8 +46,10 @@ async function removeCv(address: number) {
         :key="cv.address"
         :address="cv.address"
         :title="cv.title"
-        :value="cv.value"
+        :value="cv.value?.value"
+        :fetching="cv.value?.fetching"
         @delete="removeCv"
+        @refresh="refreshCv"
       />
     </div>
   </div>

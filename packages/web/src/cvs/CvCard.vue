@@ -18,6 +18,7 @@ const props = defineProps<{
   address: number;
   title: string;
   value?: number;
+  fetching?: boolean;
 }>();
 
 defineEmits<{
@@ -61,6 +62,7 @@ const shortInfo = computed(() => {
             value === undefined ? 'text-muted-foreground/70' : 'text-destructive-foreground/70'
           "
           @click="$emit('refresh', address)"
+          :diabled="fetching"
           variant="ghost"
         >
           <span class="group-hover:opacity-0">{{
@@ -87,8 +89,9 @@ const shortInfo = computed(() => {
           size="icon"
           class="cursor-pointer"
           @click="$emit('refresh', address)"
+          :disabled="fetching"
         >
-          <RefreshCwIcon class="h-4 w-4 opacity-60" />
+          <RefreshCwIcon class="h-4 w-4 opacity-60" :class="{ 'animate-spin': fetching }" />
         </Button>
         <ConfirmDialogButton
           title="Delete CV?"
