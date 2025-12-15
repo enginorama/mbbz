@@ -44,17 +44,17 @@ const navItems = computed<NavItem[]>(() => {
     {
       label: 'sidebar.cabs',
       icon: TrainFrontIcon,
-      to: '/cabs',
+      to: { name: '/(main)/cabs/' },
     },
     {
       label: 'sidebar.turnouts',
       icon: SplitIcon,
-      to: '/turnouts',
+      to: { name: '/(main)/turnouts/' },
     },
     {
       label: 'sidebar.sensors',
       icon: GamepadDirectionalIcon,
-      to: '/sensors',
+      to: { name: '/(main)/sensors' },
     },
     {
       label: 'sidebar.cvs',
