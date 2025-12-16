@@ -5,9 +5,9 @@ import { Toaster } from 'vue-sonner';
 </script>
 
 <template>
-  <SidebarProvider style="--sidebar-width: 16rem; --sidebar-width-mobile: 18rem">
+  <SidebarProvider style="--sidebar-width: 16rem; --sidebar-width-mobile: 18rem" class="h-svh">
     <AppSidebar />
-    <main class="w-full p-6">
+    <main class="w-full overflow-auto [&>div]:p-6">
       <RouterView />
     </main>
     <Toaster :rich-colors="true" />

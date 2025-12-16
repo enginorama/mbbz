@@ -7,5 +7,20 @@
     "start": "Start",
     "throttle": "Throttle",
     "turnouts": "Turnouts"
+  },
+  "cvs": {
+    "info": {
+      "1": "Short Address",
+      "2": "V Start",
+      "3": "Acceleration rate",
+      "4": "Deceleration rate",
+      "5": "V High",
+      "6": "V Mid",
+      "7": "Version",
+      "8": "Manufacturer",
+      "9": "Total PWM Period",
+      "19": "Consist Address",
+      "29": "Mode Control"
+    }
   }
 }

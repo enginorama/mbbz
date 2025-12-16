@@ -30,6 +30,7 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | '/(main)/cabs/'
       | '/(main)/cvs'
+      | '/(main)/logs'
       | '/(main)/sensors'
       | '/(main)/throttle'
       | '/(main)/turnouts/'
@@ -44,6 +45,13 @@ declare module 'vue-router/auto-routes' {
     '/(main)/cvs': RouteRecordInfo<
       '/(main)/cvs',
       '/cvs',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/(main)/logs': RouteRecordInfo<
+      '/(main)/logs',
+      '/logs',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -94,6 +102,7 @@ declare module 'vue-router/auto-routes' {
         | '/(main)'
         | '/(main)/cabs/'
         | '/(main)/cvs'
+        | '/(main)/logs'
         | '/(main)/sensors'
         | '/(main)/throttle'
         | '/(main)/turnouts/'
@@ -109,6 +118,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/(main)/cvs.vue': {
       routes:
         | '/(main)/cvs'
+      views:
+        | never
+    }
+    'src/pages/(main)/logs.vue': {
+      routes:
+        | '/(main)/logs'
       views:
         | never
     }

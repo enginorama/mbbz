@@ -48,7 +48,6 @@ async function tryToOpenConnection() {
     await open();
   } catch (e) {
     toast.error('Failed to open port');
-    console.error('gna');
     console.error(e);
   }
 }
@@ -94,9 +93,11 @@ const connection = computed(() => ({
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <LogsIcon />
-              Logs
+            <DropdownMenuItem as-child>
+              <RouterLink :to="{ name: '/(main)/logs' }">
+                <LogsIcon />
+                Logs
+              </RouterLink>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <SettingsIcon />

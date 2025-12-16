@@ -1,6 +1,6 @@
 import { manifacturerIds } from './manifacturerIds';
 
-export class CvAnalyer {
+export class CvAnalyser {
   getShortAnalysis(address: number, value: number): string | null {
     switch (address) {
       case 8:
@@ -10,4 +10,4 @@ export class CvAnalyer {
   }
 }
 
-export const cvAnalyer = new CvAnalyer();
+export const cvAnalyser = new CvAnalyser();

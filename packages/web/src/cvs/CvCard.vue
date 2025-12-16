@@ -11,7 +11,8 @@ import CardHeader from '@/core/components/ui/card/CardHeader.vue';
 import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import { EditIcon, RefreshCwIcon, TrashIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { cvAnalyer } from './analysis/CvAnalyser';
+import { cvAnalyser } from './analysis/CvAnalyser';
+import { useCvInfo } from './analysis/CvInfo';
 import CvValue from './CvValue.vue';
 
 const props = defineProps<{
@@ -31,8 +32,10 @@ const shortInfo = computed(() => {
   if (props.value == null) {
     return null;
   }
-  return cvAnalyer.getShortAnalysis(props.address, props.value);
+  return cvAnalyser.getShortAnalysis(props.address, props.value);
 });
+
+const info = useCvInfo(props.address);
 </script>
 
 <template>
@@ -40,7 +43,7 @@ const shortInfo = computed(() => {
     <CardHeader class="grid-rows-1 gap-0 px-4 py-1">
       <CardTitle class="text-md flex h-10 items-center justify-between font-medium opacity-60">
         <div class="overflow-hidden text-ellipsis whitespace-nowrap" :title="title">
-          {{ title }}
+          {{ info ?? title }}
         </div>
       </CardTitle>
       <CardAction>
