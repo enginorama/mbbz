@@ -25,7 +25,7 @@ export function useWebSerial(callback: (msg: string) => void) {
     });
   }
 
-  return { open, close, writeToStream, connected, isSupported };
+  return { open, close, getPorts, writeToStream, connected, isSupported };
 
   async function open(config?: WebSerialConfig): Promise<boolean> {
     const autoConnectPort = config?.port;
@@ -110,6 +110,11 @@ export function useWebSerial(callback: (msg: string) => void) {
         break;
       }
     }
+  }
+
+  async function getPorts(): Promise<SerialPort[]> {
+    if (!isSupported.value) return [];
+    return await navigator.serial.getPorts();
   }
 }
 

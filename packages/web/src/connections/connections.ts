@@ -9,3 +9,7 @@ export const dccInputBus: EventBusKey<DccExCommand> = Symbol('dcc-input-bus');
 export function useDccInputBus() {
   return useEventBus(dccInputBus);
 }
+
+export function useRawOutputBus() {
+  return useEventBus(rawOutputBus);
+}

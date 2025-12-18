@@ -27,7 +27,7 @@ const { isMobile } = useSidebar();
 const bus = useEventBus(rawInputBus);
 const dccInputBus = useDccInputBus();
 
-const { open, close, connected, writeToStream } = useWebSerial((msg) => {
+const { open, close, connected, writeToStream, getPorts } = useWebSerial((msg) => {
   bus.emit(msg);
   const packets = parseDccExString(msg);
   packets.forEach((packet) => {
@@ -45,6 +45,12 @@ outputBus.on((msg) => {
 
 async function tryToOpenConnection() {
   try {
+    const ports = await getPorts();
+    const firstPort = ports[0];
+    if (firstPort && ports.length > 0) {
+      await open({ port: firstPort });
+      return;
+    }
     await open();
   } catch (e) {
     toast.error('Failed to open port');
