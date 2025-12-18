@@ -7,7 +7,9 @@ import NumberFieldContent from '@/core/components/ui/number-field/NumberFieldCon
 import NumberFieldDecrement from '@/core/components/ui/number-field/NumberFieldDecrement.vue';
 import NumberFieldIncrement from '@/core/components/ui/number-field/NumberFieldIncrement.vue';
 import NumberFieldInput from '@/core/components/ui/number-field/NumberFieldInput.vue';
+import CvTable from '@/cvs/cv-table/CvTable.vue';
 import CvCard from '@/cvs/CvCard.vue';
+import type { CvData } from '@/cvs/CvData';
 import { useCvStore } from '@/stores/useCvStore';
 import { PlusIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
@@ -18,7 +20,7 @@ const cvStore = useCvStore();
 
 const cvAddressToAdd = ref<number>(1);
 
-const sortedCvs = computed(() => {
+const sortedCvs = computed<CvData[]>(() => {
   return Array.from(cvs.value)
     .sort((a, b) => a - b)
     .map((address) => {
@@ -76,6 +78,9 @@ async function refreshAllCvs() {
         @delete="removeCv"
         @refresh="refreshCv"
       />
+    </div>
+    <div>
+      <CvTable :cvData="sortedCvs" />
     </div>
   </div>
 </template>
