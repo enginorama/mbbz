@@ -51,7 +51,7 @@ describe('DCC Ex Parser', () => {
       expect(parseDccExString('<S "this is a single param">')).toEqual([
         {
           command: 'S',
-          params: ['this is a single param'],
+          params: ['"this is a single param"'],
         },
       ]);
     });
@@ -59,7 +59,7 @@ describe('DCC Ex Parser', () => {
       expect(parseDccExString('<S "this is param one" "and this is param two">')).toEqual([
         {
           command: 'S',
-          params: ['this is param one', 'and this is param two'],
+          params: ['"this is param one"', '"and this is param two"'],
         },
       ]);
     });
@@ -70,7 +70,7 @@ describe('DCC Ex Parser', () => {
       expect(parseDccExString('<S "with a < in it">')).toEqual([
         {
           command: 'S',
-          params: ['with a < in it'],
+          params: ['"with a < in it"'],
         },
       ]);
     });
@@ -88,7 +88,7 @@ describe('DCC Ex Parser', () => {
       expect(parseDccExString('<S "single param" "split missing>')).toEqual([
         {
           command: 'S',
-          params: ['single param', 'split', 'missing'],
+          params: ['"single param"', 'split', 'missing'],
         },
       ]);
     });
@@ -97,7 +97,7 @@ describe('DCC Ex Parser', () => {
       expect(parseDccExString('<S "single \\"param\\"">')).toEqual([
         {
           command: 'S',
-          params: [],
+          params: ['""'],
         },
       ]);
     });

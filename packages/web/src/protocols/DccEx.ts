@@ -10,7 +10,7 @@ export function parseDccExString(input: string) {
   for (const line of lines) {
     if (!line?.trim()) continue;
 
-    const parts = [...line.matchAll(/(?:([^\s"]+)|"([^"]*)")+[\s]*/gm)];
+    const parts = [...line.matchAll(/(?:([^\s"]+)|("(?:[^"]*)"))+[\s]*/gm)];
     console.log(parts);
     const fragments: Array<string> = parts
       .map((r) => r[1] ?? r[2] ?? '')
