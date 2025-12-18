@@ -29,6 +29,7 @@ async function processQueue() {
     return;
   }
   await task();
+  await new Promise((resolve) => setTimeout(resolve, 100));
   queue.shift();
   processQueue();
 }
