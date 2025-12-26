@@ -79,7 +79,7 @@ async function refreshAllCvs() {
         @refresh="refreshCv"
       />
     </div>
-    <div>
+    <div class="mt-7">
       <CvTable :cvData="sortedCvs" />
     </div>
   </div>
