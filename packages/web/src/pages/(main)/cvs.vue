@@ -10,7 +10,7 @@ import NumberFieldInput from '@/core/components/ui/number-field/NumberFieldInput
 import CvTable from '@/cvs/cv-table/CvTable.vue';
 import CvCard from '@/cvs/CvCard.vue';
 import type { CvData } from '@/cvs/CvData';
-import { useCvStore } from '@/stores/useCvStore';
+import { useCvStore } from '@/cvs/useCvStore';
 import { PlusIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
@@ -42,8 +42,8 @@ async function refreshCv(address: number) {
 }
 
 async function refreshAllCvs() {
-  for (const address of cvs.value) {
-    await cvStore.readCv(address);
+  for (const cv of sortedCvs.value) {
+    await cvStore.readCv(cv.address);
   }
 }
 </script>
