@@ -74,11 +74,21 @@ const connection = computed(() => ({
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarFallback class="rounded-lg"><UnplugIcon /></AvatarFallback>
+              <AvatarFallback class="rounded-lg">
+                <CableIcon v-if="connected" />
+                <UnplugIcon v-else />
+              </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-medium">{{ connection.type }}</span>
-              <span class="truncate text-xs">{{ connection.status }}</span>
+              <span
+                class="truncate text-xs"
+                :class="{
+                  'text-green-500': connection.status === 'connected',
+                  'text-destructive': connection.status === 'disconnected',
+                }"
+                >{{ connection.status }}</span
+              >
             </div>
             <ChevronsUpDown class="ml-auto size-4" />
           </SidebarMenuButton>

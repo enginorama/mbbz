@@ -11,7 +11,7 @@ import CvTable from '@/cvs/cv-table/CvTable.vue';
 import CvCard from '@/cvs/CvCard.vue';
 import type { CvData } from '@/cvs/CvData';
 import { useCvStore } from '@/cvs/useCvStore';
-import { PlusIcon } from 'lucide-vue-next';
+import { DownloadIcon, PlusIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 const cvs = ref(new Set<number>([1, 8, 29, 5, 6]));
@@ -46,6 +46,20 @@ async function refreshAllCvs() {
     await cvStore.readCv(cv.address);
   }
 }
+
+function downloadCsv() {
+  const header = '"Address","Title","Value"\n';
+  const data = sortedCvs.value
+    .map((cv) => `"${cv.address}","${cv.title}","${cv.value?.value ?? ''}"`)
+    .join('\n');
+  const blob = new Blob([`${header}${data}`], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cvs.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 </script>
 
 <template>
@@ -64,7 +78,10 @@ async function refreshAllCvs() {
         </NumberField>
         <Button variant="outline" @click="cvs.add(cvAddressToAdd)">Hinzufügen</Button>
       </div>
-      <Button @click="refreshAllCvs">Refresh all</Button>
+      <div class="flex gap-2">
+        <Button @click="downloadCsv"><DownloadIcon /> CSV</Button>
+        <Button @click="refreshAllCvs">Refresh all</Button>
+      </div>
     </Item>
     <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       <CvCard

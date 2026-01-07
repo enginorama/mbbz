@@ -7,7 +7,7 @@ export interface RosterEntry {
   functionMap: Map<number, string>;
 }
 
-export const useCvStore = defineStore('cv-roster', () => {
+export const useRosterStore = defineStore('roster', () => {
   const roster = ref<Map<number, RosterEntry>>(new Map());
 
   return { roster };
