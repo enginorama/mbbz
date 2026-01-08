@@ -43,7 +43,7 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <PageTitle title="Log" />
+    <PageTitle title="Logs" subtitle="Serial protocol" />
     <div class="w-full grow overflow-y-auto border border-gray-300 bg-gray-50 p-4">
       <div v-for="(msg, index) in logMessages" :key="index" class="mb-1 flex gap-2">
         <ArrowBigLeftDashIcon v-if="msg.type === 'OUT'" class="text-orange-500" />
@@ -53,7 +53,7 @@ onMounted(() => {
       </div>
       <span ref="scrollAnchor"></span>
     </div>
-    <div class="mb-4 flex gap-2 border-t py-4">
+    <div class="mb-4 flex gap-2 py-4">
       <Input
         type="text"
         placeholder="Type message to send to DCC"

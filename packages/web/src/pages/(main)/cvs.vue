@@ -64,7 +64,7 @@ function downloadCsv() {
 
 <template>
   <div>
-    <PageTitle title="CVs" subtitle="Read and write CVs" class="mb-6">
+    <PageTitle title="CVs" subtitle="Read and write CVs">
       <Button variant="default" class="rounded-full"><PlusIcon class="h-6" />CV hinzufügen</Button>
     </PageTitle>
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">

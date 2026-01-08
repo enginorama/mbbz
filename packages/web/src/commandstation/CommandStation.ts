@@ -7,6 +7,12 @@ export interface RosterEntry {
   name: string;
 }
 
+export interface TurnoutEntry {
+  id: number;
+  name: string;
+  status: string;
+}
+
 export class CommandStation {
   private outputBus = useExStationOutputBus();
   private dccInputBus = useExNativeInputBus();
@@ -53,6 +59,46 @@ export class CommandStation {
         ) {
           const name = packet.params[1].substring(1, packet.params[1].length - 1);
           return { address: address, name: name };
+        }
+      },
+      defaultValue: null,
+    });
+  }
+
+  public async getTurnoutEntries(): Promise<Array<TurnoutEntry>> {
+    const entries: Array<TurnoutEntry> = [];
+    const turnoutIds = await this.getTurnoutIds();
+    for (const id of turnoutIds) {
+      const entry = await this.getTurnoutEntry(id);
+      if (entry !== null) {
+        entries.push(entry);
+      }
+    }
+    return entries;
+  }
+
+  public async getTurnoutIds(): Promise<number[]> {
+    return this.sendAndWaitForResponse<number[]>({
+      command: '<JT>',
+      callback: (packet) => {
+        if (packet.command === 'jT' && !packet.params[2]?.startsWith(`"`)) {
+          return packet.params.map((param) => Number(param));
+        }
+      },
+      defaultValue: [],
+    });
+  }
+
+  public async getTurnoutEntry(id: number): Promise<TurnoutEntry | null> {
+    return this.sendAndWaitForResponse<TurnoutEntry | null>({
+      command: `<JT ${id}>`,
+      callback: (packet) => {
+        if (packet.command === 'jT' && packet.params[2]?.startsWith(`"`)) {
+          return {
+            id: Number(packet.params[0]),
+            name: packet.params[2].substring(1, packet.params[2].length - 1) ?? '',
+            status: packet.params[1] ?? '',
+          };
         }
       },
       defaultValue: null,
