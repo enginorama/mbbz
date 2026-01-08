@@ -1,5 +1,6 @@
 export class Queue {
   private queue: Array<() => Promise<unknown>> = [];
+  private delayBetweenTasksMs = 100;
 
   public async add<T>(task: () => Promise<T>) {
     return new Promise<T>((resolve) => {
@@ -20,7 +21,7 @@ export class Queue {
       return;
     }
     await task();
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, this.delayBetweenTasksMs));
     this.queue.shift();
     this.processQueue();
   }

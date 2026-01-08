@@ -1,4 +1,4 @@
-import { useDccInputBus, useRawOutputBus } from '@/connections/connections';
+import { useExNativeInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
 import { Queue } from '@/lib/queue';
 import type { DccExCommand } from '@/protocols/DccEx';
 
@@ -8,8 +8,8 @@ export interface RosterEntry {
 }
 
 export class CommandStation {
-  private outputBus = useRawOutputBus();
-  private dccInputBus = useDccInputBus();
+  private outputBus = useExStationOutputBus();
+  private dccInputBus = useExNativeInputBus();
   private queue = new Queue();
 
   public async refreshRoster() {

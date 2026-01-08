@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { rawInputBus, rawOutputBus } from '@/connections/connections';
+import { useExStationInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
 import PageTitle from '@/core/components/PageTitle.vue';
 import Input from '@/core/components/ui/input/Input.vue';
-import { useEventBus } from '@vueuse/core';
 import { nextTick, shallowRef, useTemplateRef, watch } from 'vue';
 
-const inputBus = useEventBus<string>(rawInputBus);
-const outputBus = useEventBus<string>(rawOutputBus);
+const inputBus = useExStationInputBus();
+const outputBus = useExStationOutputBus();
 
 const logMessages = shallowRef<string[]>([]);
 
