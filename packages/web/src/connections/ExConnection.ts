@@ -1,7 +1,8 @@
 import { parseDccExString } from '@/protocols/DccEx';
-import { inject, onUnmounted, provide, readonly, type InjectionKey, type Ref } from 'vue';
+import { inject, onUnmounted, provide, readonly, watch, type InjectionKey, type Ref } from 'vue';
 import { toast } from 'vue-sonner';
 import { useExNativeInputBus, useExStationInputBus, useExStationOutputBus } from './ExEventBus';
+import { useConnectionLogger } from './useConnectionLogger';
 import { useWebSerial } from './useWebSerial';
 
 const connectionInjectionKey = Symbol() as InjectionKey<{
@@ -22,6 +23,7 @@ export function provideWebSocketConnection() {
   const bus = useExStationInputBus();
   const dccInputBus = useExNativeInputBus();
   const outputBus = useExStationOutputBus();
+  const { log } = useConnectionLogger();
 
   const { open, close, connected, writeToStream, getPorts } = useWebSerial((msg) => {
     bus.emit(msg);
@@ -38,6 +40,14 @@ export function provideWebSocketConnection() {
     }
   });
 
+  bus.on((data) => {
+    log({ type: 'IN', message: data });
+  });
+
+  outputBus.on((data) => {
+    log({ type: 'OUT', message: data });
+  });
+
   async function tryToOpenConnection() {
     try {
       const ports = await getPorts();
@@ -52,6 +62,14 @@ export function provideWebSocketConnection() {
       console.error(e);
     }
   }
+
+  watch(connected, (newVal) => {
+    if (newVal) {
+      log({ type: 'INFO', message: 'Connected.' });
+    } else {
+      log({ type: 'INFO', message: 'Disconnected.' });
+    }
+  });
 
   onUnmounted(() => {
     if (connected.value) {
