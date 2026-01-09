@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { provideWebSocketConnection } from './connections/ExConnection';
+import {
+  provideWebSerialConnection,
+  setupBusLogger,
+  setupDccInputBus,
+} from './connections/ExConnection';
 import DialogContainer from './core/dialogs/DialogContainer.vue';
 import { provideDialogSystem } from './core/dialogs/useAppDialog';
 
+setupBusLogger();
+setupDccInputBus();
+
 provideDialogSystem();
-provideWebSocketConnection();
+provideWebSerialConnection();
 </script>
 
 <template>

@@ -19,33 +19,45 @@ export function useConnection() {
   return connection;
 }
 
-export function provideWebSocketConnection() {
-  const bus = useExStationInputBus();
+export function setupBusLogger() {
+  const { log } = useConnectionLogger();
+  const inputBus = useExStationInputBus();
+  const outputBus = useExStationOutputBus();
+
+  inputBus.on((data) => {
+    log({ type: 'IN', message: data });
+  });
+
+  outputBus.on((data) => {
+    log({ type: 'OUT', message: data });
+  });
+}
+
+export function setupDccInputBus() {
   const dccInputBus = useExNativeInputBus();
+  const inputBus = useExStationInputBus();
+
+  inputBus.on((data) => {
+    const packets = parseDccExString(data);
+    packets.forEach((packet) => {
+      dccInputBus.emit(packet);
+    });
+  });
+}
+
+export function provideWebSerialConnection() {
+  const inputBus = useExStationInputBus();
   const outputBus = useExStationOutputBus();
   const { log } = useConnectionLogger();
 
   const { open, close, connected, writeToStream, getPorts } = useWebSerial((msg) => {
-    bus.emit(msg);
-    const packets = parseDccExString(msg);
-    packets.forEach((packet) => {
-      dccInputBus.emit(packet);
-    });
-    console.log(msg);
+    inputBus.emit(msg);
   });
 
   outputBus.on((msg) => {
     if (connected.value) {
       writeToStream(msg);
     }
-  });
-
-  bus.on((data) => {
-    log({ type: 'IN', message: data });
-  });
-
-  outputBus.on((data) => {
-    log({ type: 'OUT', message: data });
   });
 
   async function tryToOpenConnection() {
