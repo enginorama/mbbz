@@ -29,12 +29,36 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       Record<never, never>,
       | '/(main)/cabs/'
+      | '/(main)/cvs'
+      | '/(main)/logs'
+      | '/(main)/sensors'
       | '/(main)/throttle'
       | '/(main)/turnouts/'
     >,
     '/(main)/cabs/': RouteRecordInfo<
       '/(main)/cabs/',
       '/cabs',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/(main)/cvs': RouteRecordInfo<
+      '/(main)/cvs',
+      '/cvs',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/(main)/logs': RouteRecordInfo<
+      '/(main)/logs',
+      '/logs',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/(main)/sensors': RouteRecordInfo<
+      '/(main)/sensors',
+      '/sensors',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -77,6 +101,9 @@ declare module 'vue-router/auto-routes' {
       routes:
         | '/(main)'
         | '/(main)/cabs/'
+        | '/(main)/cvs'
+        | '/(main)/logs'
+        | '/(main)/sensors'
         | '/(main)/throttle'
         | '/(main)/turnouts/'
       views:
@@ -85,6 +112,24 @@ declare module 'vue-router/auto-routes' {
     'src/pages/(main)/cabs/index.vue': {
       routes:
         | '/(main)/cabs/'
+      views:
+        | never
+    }
+    'src/pages/(main)/cvs.vue': {
+      routes:
+        | '/(main)/cvs'
+      views:
+        | never
+    }
+    'src/pages/(main)/logs.vue': {
+      routes:
+        | '/(main)/logs'
+      views:
+        | never
+    }
+    'src/pages/(main)/sensors.vue': {
+      routes:
+        | '/(main)/sensors'
       views:
         | never
     }

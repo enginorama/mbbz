@@ -11,18 +11,58 @@ import {
 import {
   GamepadDirectionalIcon,
   GaugeIcon,
-  HomeIcon,
-  MemoryStickIcon,
+  ServerCogIcon,
   SplitIcon,
   TrainFrontIcon,
 } from 'lucide-vue-next';
-import { markRaw } from 'vue';
-import { RouterLink } from 'vue-router';
+import { computed, markRaw, type FunctionalComponent } from 'vue';
+import { RouterLink, type RouteLocationRaw } from 'vue-router';
 import Separator from '../ui/separator/Separator.vue';
 import SidebarFooter from '../ui/sidebar/SidebarFooter.vue';
 import SidebarHeader from '../ui/sidebar/SidebarHeader.vue';
 import SidebarRail from '../ui/sidebar/SidebarRail.vue';
 import ConnectionWidget from './ConnectionWidget.vue';
+
+interface NavItem {
+  label: string;
+  icon: FunctionalComponent;
+  to: RouteLocationRaw;
+}
+
+const navItems = computed<NavItem[]>(() => {
+  return [
+    {
+      label: 'sidebar.start',
+      icon: TrainFrontIcon,
+      to: { name: '/(main)' },
+    },
+    {
+      label: 'sidebar.throttle',
+      icon: GaugeIcon,
+      to: { name: '/(main)/throttle' },
+    },
+    {
+      label: 'sidebar.cabs',
+      icon: TrainFrontIcon,
+      to: { name: '/(main)/cabs/' },
+    },
+    {
+      label: 'sidebar.turnouts',
+      icon: SplitIcon,
+      to: { name: '/(main)/turnouts/' },
+    },
+    {
+      label: 'sidebar.sensors',
+      icon: GamepadDirectionalIcon,
+      to: { name: '/(main)/sensors' },
+    },
+    {
+      label: 'sidebar.cvs',
+      icon: ServerCogIcon,
+      to: { name: '/(main)/cvs' },
+    },
+  ];
+});
 </script>
 
 <template>
@@ -47,52 +87,14 @@ import ConnectionWidget from './ConnectionWidget.vue';
     <SidebarContent>
       <SidebarGroup>
         <SidebarGroupContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink :to="{ name: '/(main)' }" class="flex items-center gap-2">
-                  <HomeIcon />
-                  <span>{{ $t('sidebar.start') }}</span>
-                </RouterLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink :to="{ name: '/(main)/throttle' }" class="flex items-center gap-2">
-                  <GaugeIcon />
-                  <span>{{ $t('sidebar.throttle') }}</span>
-                </RouterLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink to="/cabs" class="flex items-center gap-2">
-                  <TrainFrontIcon />
-                  <span>{{ $t('sidebar.cabs') }}</span>
-                </RouterLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink to="/turnouts" class="flex items-center gap-2">
-                  <SplitIcon />
-                  <span>{{ $t('sidebar.turnouts') }}</span>
-                </RouterLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink to="/turnouts" class="flex items-center gap-2">
-                  <GamepadDirectionalIcon />
-                  <span>{{ $t('sidebar.sensors') }}</span>
-                </RouterLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="lg">
-                <RouterLink to="/turnouts" class="flex items-center gap-2">
-                  <MemoryStickIcon />
-                  <span>{{ $t('sidebar.maintenance') }}</span>
+          <SidebarMenu class="gap-3">
+            <SidebarMenuItem v-for="navItem in navItems" :key="navItem.label">
+              <SidebarMenuButton as-child size="lg">
+                <RouterLink :to="navItem.to">
+                  <div class="flex aspect-square size-8 items-center justify-center">
+                    <component :is="navItem.icon" />
+                  </div>
+                  <span>{{ $t(navItem.label) }}</span>
                 </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>

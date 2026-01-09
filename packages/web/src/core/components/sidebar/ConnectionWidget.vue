@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWebSerial } from '@/connections/useWebSerial';
+import { useConnection } from '@/connections/ExConnection';
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import {
   DropdownMenu,
@@ -15,32 +15,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/core/components/ui/sidebar';
-import { useEventBus, type EventBusKey } from '@vueuse/core';
 import { CableIcon, ChevronsUpDown, LogsIcon, SettingsIcon, UnplugIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { toast } from 'vue-sonner';
 
 const { isMobile } = useSidebar();
 
-const fooKey: EventBusKey<string> = Symbol('symbol-key');
-const bus = useEventBus(fooKey);
+const { connected, connect, disconnect } = useConnection();
 
-const { open, close, connected } = useWebSerial((msg) => {
-  bus.emit(msg);
-  console.log(msg);
-});
-
-async function tryToOpenConnection() {
-  try {
-    await open();
-  } catch (e) {
-    toast.error('Failed to open port');
-    console.error('gna');
-    console.error(e);
-  }
-}
-
-const connection = computed(() => ({
+const connectionInfo = computed(() => ({
   status: connected.value ? 'connected' : 'disconnected',
   protocol: 'dcc-ex',
   type: 'Serial',
@@ -56,11 +38,21 @@ const connection = computed(() => ({
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarFallback class="rounded-lg"><UnplugIcon /></AvatarFallback>
+              <AvatarFallback class="rounded-lg">
+                <CableIcon v-if="connected" />
+                <UnplugIcon v-else />
+              </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-medium">{{ connection.type }}</span>
-              <span class="truncate text-xs">{{ connection.status }}</span>
+              <span class="truncate font-medium">{{ connectionInfo.type }}</span>
+              <span
+                class="truncate text-xs"
+                :class="{
+                  'text-green-500': connectionInfo.status === 'connected',
+                  'text-destructive': connectionInfo.status === 'disconnected',
+                }"
+                >{{ connectionInfo.status }}</span
+              >
             </div>
             <ChevronsUpDown class="ml-auto size-4" />
           </SidebarMenuButton>
@@ -73,7 +65,7 @@ const connection = computed(() => ({
         >
           <DropdownMenuGroup v-if="!connected">
             <DropdownMenuItem as-child>
-              <SidebarMenuButton @click="tryToOpenConnection">
+              <SidebarMenuButton @click="connect">
                 <CableIcon />
                 Connect
               </SidebarMenuButton>
@@ -81,18 +73,20 @@ const connection = computed(() => ({
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <LogsIcon />
-              Logs
+            <DropdownMenuItem as-child>
+              <RouterLink :to="{ name: '/(main)/logs' }">
+                <LogsIcon />
+                Logs
+              </RouterLink>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <SettingsIcon />
               Config
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator v-if="connected" />
+          <DropdownMenuSeparator v-if="!connected" />
           <DropdownMenuItem v-if="connected" as-child>
-            <SidebarMenuButton @click="close">
+            <SidebarMenuButton @click="disconnect">
               <CableIcon />
               Disconnect
             </SidebarMenuButton>
