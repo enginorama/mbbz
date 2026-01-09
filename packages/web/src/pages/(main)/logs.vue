@@ -29,7 +29,6 @@ function send(event: KeyboardEvent) {
 watch(
   () => logMessages.value,
   async () => {
-    console.log('Scrolling to bottom');
     await nextTick();
     scrollAnchorRef.value?.scrollIntoView({ behavior: 'smooth' });
   },

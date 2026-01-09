@@ -30,7 +30,6 @@ const entries = ref<Array<RosterEntry>>([]);
 
 async function refresh() {
   entries.value = await commandStation.getRosterEntries();
-  console.log('Roster entries:', entries.value);
   rosterStore.$patch({
     roster: new Map(entries.value.map((entry) => [entry.address, entry])),
   });
