@@ -45,11 +45,15 @@ const cabs = computed(() => Array.from(rosterStore.roster.values()));
       <CardHeader>
         <CardTitle>Cabs</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent
+        class="px-0 **:data-[slot=table-cell]:first:px-6 **:data-[slot=table-head]:first:px-6"
+      >
         <Table>
           <TableHeader>
-            <TableHead>Address</TableHead>
-            <TableHead>Name</TableHead>
+            <TableRow>
+              <TableHead>Address</TableHead>
+              <TableHead>Name</TableHead>
+            </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow v-for="data in cabs" :key="data.address">

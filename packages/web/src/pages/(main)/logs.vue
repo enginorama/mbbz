@@ -6,7 +6,7 @@ import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import { ArrowBigLeftDashIcon, ArrowBigRightDashIcon, InfoIcon, SendIcon } from 'lucide-vue-next';
-import { nextTick, onMounted, useTemplateRef, watch } from 'vue';
+import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 const outputBus = useExStationOutputBus();
 
@@ -16,14 +16,17 @@ const scrollAnchorRef = useTemplateRef<HTMLElement>('scrollAnchor');
 
 const { connected } = useConnection();
 
-function send(event: KeyboardEvent) {
+const messageToSend = ref('');
+
+function send() {
   if (!connected.value) {
     return;
   }
-  const target = event.target as HTMLInputElement;
-  const value = target.value;
-  outputBus.emit(value);
-  target.value = '';
+  if (messageToSend.value.trim() === '') {
+    return;
+  }
+  outputBus.emit(messageToSend.value.trim());
+  messageToSend.value = '';
 }
 
 watch(
@@ -55,6 +58,7 @@ onMounted(() => {
     <div class="mb-4 flex gap-2 py-4">
       <Input
         type="text"
+        v-model="messageToSend"
         placeholder="Type message to send to DCC"
         class="input input-bordered w-full"
         :class="{
