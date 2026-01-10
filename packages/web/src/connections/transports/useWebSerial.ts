@@ -21,6 +21,6 @@ export function useWebSerial(callback: (msg: string) => void) {
     getPorts: exWebSerial.getPorts.bind(exWebSerial),
     writeToStream: exWebSerial.writeToStream.bind(exWebSerial),
     connected,
-    isSupported: exWebSerial.isSupported,
+    isSupported: ExWebSerial.isSupported,
   };
 }

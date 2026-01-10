@@ -20,10 +20,10 @@ import { computed } from 'vue';
 
 const { isMobile } = useSidebar();
 
-const { connected, connect, disconnect } = useConnection();
+const { connected, connect, disconnect, connecting } = useConnection();
 
 const connectionInfo = computed(() => ({
-  status: connected.value ? 'connected' : 'disconnected',
+  status: connected.value ? 'connected' : connecting.value ? 'connecting' : 'disconnected',
   protocol: 'dcc-ex',
   type: 'Serial',
 }));
@@ -49,6 +49,7 @@ const connectionInfo = computed(() => ({
                 class="truncate text-xs"
                 :class="{
                   'text-green-500': connectionInfo.status === 'connected',
+                  'text-yellow-500': connectionInfo.status === 'connecting',
                   'text-destructive': connectionInfo.status === 'disconnected',
                 }"
                 >{{ connectionInfo.status }}</span
@@ -65,7 +66,7 @@ const connectionInfo = computed(() => ({
         >
           <DropdownMenuGroup v-if="!connected">
             <DropdownMenuItem as-child>
-              <SidebarMenuButton @click="connect">
+              <SidebarMenuButton @click="connect" :disabled="connecting">
                 <CableIcon />
                 Connect
               </SidebarMenuButton>

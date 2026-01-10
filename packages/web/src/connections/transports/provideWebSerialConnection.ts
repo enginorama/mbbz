@@ -1,4 +1,4 @@
-import { onUnmounted, provide, readonly, watch } from 'vue';
+import { onUnmounted, provide, readonly, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { connectionInjectionKey } from '../ExConnection';
 import { useExStationInputBus, useExStationOutputBus } from '../ExEventBus';
@@ -9,6 +9,7 @@ export function provideWebSerialConnection() {
   const inputBus = useExStationInputBus();
   const outputBus = useExStationOutputBus();
   const { log } = useConnectionLogger();
+  const connecting = ref(false);
 
   const { open, close, connected, writeToStream, getPorts } = useWebSerial((msg) => {
     inputBus.emit(msg);
@@ -22,6 +23,7 @@ export function provideWebSerialConnection() {
 
   async function tryToOpenConnection() {
     try {
+      connecting.value = true;
       const ports = await getPorts();
       const firstPort = ports[0];
       if (firstPort && ports.length > 0) {
@@ -32,6 +34,8 @@ export function provideWebSerialConnection() {
     } catch (e) {
       toast.error('Failed to open port');
       console.error(e);
+    } finally {
+      connecting.value = false;
     }
   }
 
@@ -51,6 +55,7 @@ export function provideWebSerialConnection() {
 
   provide(connectionInjectionKey, {
     connect: tryToOpenConnection,
+    connecting: readonly(connecting),
     disconnect: close,
     connected: readonly(connected),
   });

@@ -7,6 +7,7 @@ export const connectionInjectionKey = Symbol() as InjectionKey<{
   connect: () => Promise<void>;
   disconnect: () => void;
   connected: Readonly<Ref<boolean>>;
+  connecting: Readonly<Ref<boolean>>;
 }>;
 
 export function useConnection() {

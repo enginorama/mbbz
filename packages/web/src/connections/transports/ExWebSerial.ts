@@ -12,7 +12,7 @@ export class ExWebSerial {
   private inputStream: ReadableStream<string> | null = null;
   private reader: ReadableStreamDefaultReader<string> | null = null;
 
-  public get isSupported() {
+  public static get isSupported() {
     return 'serial' in navigator;
   }
 
@@ -30,7 +30,7 @@ export class ExWebSerial {
   }) {
     this.onDataCallback = onData;
     this.onConnectionStatusChange = onConnectionStatusChange;
-    if (this.isSupported) {
+    if (ExWebSerial.isSupported) {
       navigator.serial.addEventListener('disconnect', (e) => {
         if (e.target === this.port) {
           this.setConnected(false);
@@ -42,7 +42,7 @@ export class ExWebSerial {
 
   public async open(config?: WebSerialConfig): Promise<boolean> {
     const autoConnectPort = config?.port;
-    if (!this.isSupported) return false;
+    if (!ExWebSerial.isSupported) return false;
     if (this.connected) return true;
     try {
       this.port = autoConnectPort ?? (await navigator.serial.requestPort());
@@ -123,7 +123,7 @@ export class ExWebSerial {
   }
 
   public async getPorts(): Promise<SerialPort[]> {
-    if (!this.isSupported) return [];
+    if (!ExWebSerial.isSupported) return [];
     return await navigator.serial.getPorts();
   }
 

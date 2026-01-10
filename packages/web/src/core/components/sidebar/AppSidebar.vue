@@ -34,7 +34,7 @@ const navItems = computed<NavItem[]>(() => {
     {
       label: 'sidebar.start',
       icon: TrainFrontIcon,
-      to: { name: '/(main)' },
+      to: { name: '/(main)/' },
     },
     {
       label: 'sidebar.throttle',
