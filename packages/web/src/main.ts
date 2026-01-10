@@ -2,7 +2,7 @@ import './styles/main.css';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 
 import { routes } from 'vue-router/auto-routes';
 
@@ -12,7 +12,9 @@ import { createI18n } from 'vue-i18n';
 import App from './App.vue';
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: import.meta.env.VITE_GITHUB_PAGES
+    ? createWebHashHistory(import.meta.env.BASE_URL)
+    : createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 

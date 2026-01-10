@@ -37,6 +37,8 @@ jobs:
         run: pnpm install
       - name: Build with Vite
         run: pnpm run build:web
+        env:
+          VITE_GITHUB_PAGES: 1
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
