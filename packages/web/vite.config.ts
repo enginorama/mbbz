@@ -3,13 +3,13 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
-import VueRouter from 'unplugin-vue-router/vite';
 import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
+import VueRouter from 'vue-router/vite';
 
 export default defineConfig({
   plugins: [
-    VueRouter(),
+    VueRouter({ dts: 'src/typed-router.d.ts' }),
     vue(),
     tailwindcss(),
     vueDevTools(),

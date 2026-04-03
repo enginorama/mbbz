@@ -1,7 +1,8 @@
 packages:
   - packages/*
-onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
-  - esbuild
-
 minimumReleaseAge: 1440
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - esbuild
+overrides:
+  rollup@>=4.0.0 <4.59.0: '>=4.59.0'
