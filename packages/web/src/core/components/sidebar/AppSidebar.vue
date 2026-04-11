@@ -11,6 +11,7 @@ import {
 import {
   GamepadDirectionalIcon,
   GaugeIcon,
+  HomeIcon,
   ServerCogIcon,
   SplitIcon,
   TrainFrontIcon,
@@ -33,7 +34,7 @@ const navItems = computed<NavItem[]>(() => {
   return [
     {
       label: 'sidebar.start',
-      icon: TrainFrontIcon,
+      icon: HomeIcon,
       to: { name: '/(main)/' },
     },
     {

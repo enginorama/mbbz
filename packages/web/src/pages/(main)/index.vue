@@ -10,7 +10,7 @@ import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
 
-const { connected, connect, connecting } = useConnection();
+const { connected, connect, connecting, disconnect } = useConnection();
 const isWebSerialSupported = ExWebSerial.isSupported;
 </script>
 
@@ -46,9 +46,23 @@ const isWebSerialSupported = ExWebSerial.isSupported;
               </li>
             </template>
           </ul>
-          <Button class="mt-6" @click="connect" :disabled="!isWebSerialSupported || connecting">
+          <Button
+            v-if="!connected"
+            class="mt-6"
+            @click="connect"
+            :disabled="!isWebSerialSupported || connecting"
+          >
             <Spinner v-if="connecting" />
             Click here to connect with Web Serial
+          </Button>
+          <Button
+            v-if="connected"
+            variant="outline"
+            class="mt-6"
+            @click="disconnect"
+            :disabled="!isWebSerialSupported || connecting"
+          >
+            Disconnect
           </Button>
         </CardContent>
       </Card>
