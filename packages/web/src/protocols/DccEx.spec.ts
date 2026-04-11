@@ -66,7 +66,7 @@ describe('DCC Ex Parser', () => {
   });
 
   describe('Characters discouraged in the specs', () => {
-    it('it allows a < character in quoted parameters', async () => {
+    it('allows a < character in quoted parameters', async () => {
       expect(parseDccExString('<S "with a < in it">')).toEqual([
         {
           command: 'S',
@@ -75,7 +75,7 @@ describe('DCC Ex Parser', () => {
       ]);
     });
 
-    it('it will end the command on a > character, even in quotes', async () => {
+    it('will end the command on a > character, even in quotes', async () => {
       expect(parseDccExString('<S "with a > in it">')).toEqual([
         {
           command: 'S',
@@ -84,7 +84,7 @@ describe('DCC Ex Parser', () => {
       ]);
     });
 
-    it('it will ignore single quotation marks', async () => {
+    it('will ignore single quotation marks', async () => {
       expect(parseDccExString('<S "single param" "split missing>')).toEqual([
         {
           command: 'S',

@@ -10,7 +10,7 @@ export class Queue {
         return result;
       });
       if (this.queue.length === 1) {
-        this.processQueue();
+        void this.processQueue();
       }
     });
   }
@@ -23,6 +23,6 @@ export class Queue {
     await task();
     await new Promise((resolve) => setTimeout(resolve, this.delayBetweenTasksMs));
     this.queue.shift();
-    this.processQueue();
+    await this.processQueue();
   }
 }

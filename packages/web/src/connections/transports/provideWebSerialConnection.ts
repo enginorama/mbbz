@@ -17,7 +17,7 @@ export function provideWebSerialConnection() {
 
   outputBus.on((msg) => {
     if (connected.value) {
-      writeToStream(msg);
+      void writeToStream(msg);
     }
   });
 
@@ -49,7 +49,7 @@ export function provideWebSerialConnection() {
 
   onUnmounted(() => {
     if (connected.value) {
-      close();
+      void close();
     }
   });
 

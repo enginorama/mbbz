@@ -19,7 +19,7 @@ export class CommandStation {
   private queue = new Queue();
 
   public async refreshRoster() {
-    this.queue.add(async () => {
+    void this.queue.add(async () => {
       this.sendCommand('<JR>');
     });
   }
@@ -118,19 +118,19 @@ export class CommandStation {
   }
 
   public refreshSensorList() {
-    this.queue.add(async () => {
+    void this.queue.add(async () => {
       this.sendCommand('<S>');
     });
   }
 
   public refreshSensorValues() {
-    this.queue.add(async () => {
+    void this.queue.add(async () => {
       this.sendCommand('<Q>');
     });
   }
 
   public setOutputPin(pin: number, value: boolean) {
-    this.queue.add(async () => {
+    void this.queue.add(async () => {
       this.sendCommand(`<z ${value ? '' : '-'}${pin}>`);
     });
   }
