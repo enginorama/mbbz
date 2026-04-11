@@ -4,7 +4,7 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 
-import { routes } from 'vue-router/auto-routes';
+import { handleHotUpdate, routes } from 'vue-router/auto-routes';
 
 import messages from '@intlify/unplugin-vue-i18n/messages';
 
@@ -17,6 +17,10 @@ const router = createRouter({
     : createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
+
+if (import.meta.hot) {
+  handleHotUpdate(router);
+}
 
 const i18n = createI18n({
   locale: 'en',

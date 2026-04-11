@@ -117,6 +117,24 @@ export class CommandStation {
     });
   }
 
+  public refreshSensorList() {
+    this.queue.add(async () => {
+      this.sendCommand('<S>');
+    });
+  }
+
+  public refreshSensorValues() {
+    this.queue.add(async () => {
+      this.sendCommand('<Q>');
+    });
+  }
+
+  public setOutputPin(pin: number, value: boolean) {
+    this.queue.add(async () => {
+      this.sendCommand(`<z ${value ? '' : '-'}${pin}>`);
+    });
+  }
+
   private async sendAndWaitForResponse<T>({
     command,
     callback,

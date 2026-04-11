@@ -21,7 +21,7 @@ import TableHead from '@/core/components/ui/table/TableHead.vue';
 import TableHeader from '@/core/components/ui/table/TableHeader.vue';
 import TableRow from '@/core/components/ui/table/TableRow.vue';
 import { FolderCode } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const commandStation = useCommandStation();
 const rosterStore = useRosterStore();
@@ -36,6 +36,10 @@ async function refresh() {
 }
 
 const cabs = computed(() => Array.from(rosterStore.roster.values()));
+
+onMounted(() => {
+  refresh();
+});
 </script>
 
 <template>

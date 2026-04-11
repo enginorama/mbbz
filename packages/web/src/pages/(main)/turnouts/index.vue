@@ -9,7 +9,7 @@ import CardHeader from '@/core/components/ui/card/CardHeader.vue';
 import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import Item from '@/core/components/ui/item/Item.vue';
 import { RefreshCwIcon } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const cs = useCommandStation();
 const turnouts = ref<Array<TurnoutEntry>>([]);
@@ -17,6 +17,10 @@ const turnouts = ref<Array<TurnoutEntry>>([]);
 async function refresh() {
   turnouts.value = await cs.getTurnoutEntries();
 }
+
+onMounted(() => {
+  refresh();
+});
 </script>
 
 <template>
