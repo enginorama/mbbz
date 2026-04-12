@@ -9,12 +9,8 @@ const props = defineProps<{
 
 <template>
   <div
-    :class="
-      cn(
-        'relative *:data-[slot=input]:has-data-[slot=decrement]:pl-5 *:data-[slot=input]:has-data-[slot=increment]:pr-5',
-        props.class,
-      )
-    "
+    data-slot="field-content"
+    :class="cn('group/field-content flex flex-1 flex-col gap-1.5 leading-snug', props.class)"
   >
     <slot />
   </div>

@@ -129,6 +129,12 @@ export class CommandStation {
     });
   }
 
+  public addSensor(sensorId: number, vPin: number, pullUp: boolean) {
+    void this.queue.add(async () => {
+      this.sendCommand(`<S ${sensorId} ${vPin} ${pullUp ? '1' : '0'}>`);
+    });
+  }
+
   public setOutputPin(pin: number, value: boolean) {
     void this.queue.add(async () => {
       this.sendCommand(`<z ${value ? '' : '-'}${pin}>`);

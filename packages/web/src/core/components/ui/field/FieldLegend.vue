@@ -4,18 +4,23 @@ import type { HTMLAttributes } from 'vue';
 
 const props = defineProps<{
   class?: HTMLAttributes['class'];
+  variant?: 'legend' | 'label';
 }>();
 </script>
 
 <template>
-  <div
+  <legend
+    data-slot="field-legend"
+    :data-variant="variant"
     :class="
       cn(
-        'relative *:data-[slot=input]:has-data-[slot=decrement]:pl-5 *:data-[slot=input]:has-data-[slot=increment]:pr-5',
+        'mb-3 font-medium',
+        'data-[variant=legend]:text-base',
+        'data-[variant=label]:text-sm',
         props.class,
       )
     "
   >
     <slot />
-  </div>
+  </legend>
 </template>

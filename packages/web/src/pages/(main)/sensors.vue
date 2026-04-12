@@ -5,6 +5,8 @@ import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import Item from '@/core/components/ui/item/Item.vue';
+import { useDialog } from '@/core/dialogs/core/useDialog';
+import AddSensorDialog from '@/sensors/AddSensorDialog.vue';
 import { computed, onMounted, ref } from 'vue';
 
 type SensorInfo = {
@@ -69,6 +71,16 @@ function setSensorValue(sensorId: number, value: boolean) {
   }
 }
 
+const dialog = useDialog();
+
+async function addSensor() {
+  const newSensorConfig = await dialog.show(AddSensorDialog, {});
+  if (!newSensorConfig) return;
+  const { sensorId, vPin, pullUp } = newSensorConfig;
+  cs.addSensor(sensorId, vPin, pullUp === '1');
+  cs.refreshSensorList();
+}
+
 onMounted(() => {
   cs.refreshSensorList();
   cs.refreshSensorValues();
@@ -83,6 +95,7 @@ onMounted(() => {
         <Button @click="cs.refreshSensorList()">Refresh Sensor List</Button>
         <Button @click="cs.refreshSensorValues()">Refresh Sensor Values</Button>
       </div>
+      <Button @click="addSensor">Add Sensor</Button>
     </Item>
     <div>
       <h2 class="mb-2 text-lg font-semibold">Sensor Values</h2>
