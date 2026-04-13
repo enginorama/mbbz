@@ -3,10 +3,22 @@ import { useCommandStation } from '@/commandstation/useCommandStation';
 import { useExNativeInputBus } from '@/connections/ExEventBus';
 import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
+import Empty from '@/core/components/ui/empty/Empty.vue';
+import EmptyDescription from '@/core/components/ui/empty/EmptyDescription.vue';
+import EmptyHeader from '@/core/components/ui/empty/EmptyHeader.vue';
+import EmptyMedia from '@/core/components/ui/empty/EmptyMedia.vue';
+import EmptyTitle from '@/core/components/ui/empty/EmptyTitle.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import Item from '@/core/components/ui/item/Item.vue';
+import Table from '@/core/components/ui/table/Table.vue';
+import TableBody from '@/core/components/ui/table/TableBody.vue';
+import TableCell from '@/core/components/ui/table/TableCell.vue';
+import TableHead from '@/core/components/ui/table/TableHead.vue';
+import TableHeader from '@/core/components/ui/table/TableHeader.vue';
+import TableRow from '@/core/components/ui/table/TableRow.vue';
 import { useDialog } from '@/core/dialogs/core/useDialog';
 import AddSensorDialog from '@/sensors/AddSensorDialog.vue';
+import { FolderCode } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 type SensorInfo = {
@@ -22,8 +34,12 @@ const cs = useCommandStation();
 const exNativeInputBus = useExNativeInputBus();
 
 const sensorInfos = ref(new Map<number, SensorInfo>());
+const localSensors = ref(new Map<number, SensorInfo>());
+
 const sensorInfoList = computed(() =>
-  Array.from(sensorInfos.value.values()).sort((a, b) => a.id - b.id),
+  Array.from(new Map([...sensorInfos.value, ...localSensors.value]).values()).sort(
+    (a, b) => a.id - b.id,
+  ),
 );
 
 exNativeInputBus.on((command) => {
@@ -77,6 +93,13 @@ async function addSensor() {
   const newSensorConfig = await dialog.show(AddSensorDialog, {});
   if (!newSensorConfig) return;
   const { sensorId, vPin, pullUp } = newSensorConfig;
+  localSensors.value.set(sensorId, {
+    id: sensorId,
+    config: {
+      vPin,
+      pullUp: pullUp === '1',
+    },
+  });
   cs.addSensor(sensorId, vPin, pullUp === '1');
   cs.refreshSensorList();
 }
@@ -98,21 +121,41 @@ onMounted(() => {
       <Button @click="addSensor">Add Sensor</Button>
     </Item>
     <div>
-      <h2 class="mb-2 text-lg font-semibold">Sensor Values</h2>
-      <ul>
-        <li v-for="sensorInfo in sensorInfoList" :key="sensorInfo.id">
-          Sensor {{ sensorInfo.id }}: {{ sensorInfo.value ? 'ON' : 'OFF' }} [{{
-            sensorInfo.config.vPin ? `vPin: ${sensorInfo.config.vPin}` : ''
-          }},
-          {{
-            sensorInfo.config.pullUp != null
-              ? sensorInfo.config.pullUp
-                ? 'pull-up'
-                : 'no pull-up'
-              : ''
-          }}]
-        </li>
-      </ul>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Sensor ID</TableHead>
+            <TableHead>vPin</TableHead>
+            <TableHead>Pull-Up</TableHead>
+            <TableHead>Value</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody v-if="sensorInfoList.length > 0">
+          <TableRow v-for="sensorInfo in sensorInfoList" :key="sensorInfo.id">
+            <TableCell>{{ sensorInfo.id }}</TableCell>
+            <TableCell>{{ sensorInfo.config.vPin }}</TableCell>
+            <TableCell>{{ sensorInfo.config.pullUp }}</TableCell>
+            <TableCell>{{ sensorInfo.value }}</TableCell>
+          </TableRow>
+        </TableBody>
+        <TableBody v-else>
+          <TableRow>
+            <TableCell colspan="4" class="text-center">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <FolderCode />
+                  </EmptyMedia>
+                  <EmptyTitle>No Sensors Yet</EmptyTitle>
+                </EmptyHeader>
+                <EmptyDescription>
+                  No sensors found. Please refresh the sensor list.
+                </EmptyDescription>
+              </Empty>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     </div>
     <div class="mt-8">
       <h2 class="mb-2 text-lg font-semibold">Set Output Pin</h2>
