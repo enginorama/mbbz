@@ -7,6 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/core/components/ui/sidebar';
 import {
   GamepadDirectionalIcon,
@@ -28,6 +29,12 @@ interface NavItem {
   label: string;
   icon: FunctionalComponent;
   to: RouteLocationRaw;
+}
+
+const { setOpenMobile } = useSidebar();
+
+function closeIfMobile(): void {
+  setOpenMobile(false);
 }
 
 const navItems = computed<NavItem[]>(() => {
@@ -67,7 +74,7 @@ const navItems = computed<NavItem[]>(() => {
 </script>
 
 <template>
-  <Sidebar variant="sidebar" collapsible="icon" side="left">
+  <Sidebar variant="inset" collapsible="icon" side="left">
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
@@ -91,7 +98,11 @@ const navItems = computed<NavItem[]>(() => {
           <SidebarMenu class="gap-3">
             <SidebarMenuItem v-for="navItem in navItems" :key="navItem.label">
               <SidebarMenuButton as-child size="lg">
-                <RouterLink :to="navItem.to">
+                <RouterLink
+                  :to="navItem.to"
+                  @click="closeIfMobile"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2"
+                >
                   <div class="flex aspect-square size-8 items-center justify-center">
                     <component :is="navItem.icon" />
                   </div>
