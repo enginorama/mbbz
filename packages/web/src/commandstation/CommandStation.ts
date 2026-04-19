@@ -13,6 +13,17 @@ export interface TurnoutEntry {
   status: string;
 }
 
+export type CsSensorInfo = {
+  id: number;
+  vPin?: number;
+  pullUp?: boolean;
+};
+
+export type CsSensorValue = {
+  id: number;
+  value: boolean;
+};
+
 export class CommandStation {
   private outputBus = useExStationOutputBus();
   private dccInputBus = useExNativeInputBus();
@@ -117,6 +128,38 @@ export class CommandStation {
     });
   }
 
+  public async getSensorList(): Promise<Array<CsSensorInfo>> {
+    return this.sendAndCollectResponses<CsSensorInfo>({
+      command: '<S>',
+      callback: (packet) => {
+        if (packet.command === 'Q' && packet.params.length === 3) {
+          const sensorId = +packet.params[0];
+          const sensorVPin = +packet.params[1];
+          const sensorPullUp = packet.params[2] === '1';
+          return {
+            id: sensorId,
+            vPin: sensorVPin,
+            pullUp: sensorPullUp,
+          };
+        }
+      },
+    });
+  }
+
+  public async getSensorValues(): Promise<Array<CsSensorValue>> {
+    return this.sendAndCollectResponses<CsSensorValue>({
+      command: '<Q>',
+      callback: (packet) => {
+        if ((packet.command === 'Q' || packet.command === 'q') && packet.params.length === 1) {
+          return {
+            id: +packet.params[0],
+            value: packet.command === 'Q',
+          };
+        }
+      },
+    });
+  }
+
   public refreshSensorList() {
     void this.queue.add(async () => {
       this.sendCommand('<S>');
@@ -159,7 +202,7 @@ export class CommandStation {
             resolve(value);
           }
         });
-        this.sendCommand(`${command}`);
+        this.sendCommand(command);
         setTimeout(() => {
           off();
           if (defaultValue === undefined) {
@@ -170,6 +213,41 @@ export class CommandStation {
         }, 3000);
       });
       return fetchedValue;
+    });
+  }
+
+  private async sendAndCollectResponses<T>({
+    command,
+    callback,
+  }: {
+    command: string;
+    callback: (command: DccExCommand) => T | undefined;
+  }): Promise<Array<T>> {
+    return this.queue.add(async () => {
+      const fetchedValues: Array<T> = [];
+      await new Promise<void>((resolve) => {
+        let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
+
+        const resetTimeout = () => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            off();
+            resolve();
+          }, 200);
+        };
+
+        const off = this.dccInputBus.on((packet) => {
+          const value = callback(packet);
+          if (value !== undefined) {
+            fetchedValues.push(value);
+            resetTimeout();
+          }
+        });
+
+        this.sendCommand(command);
+        resetTimeout();
+      });
+      return fetchedValues;
     });
   }
 
