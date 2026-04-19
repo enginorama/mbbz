@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useCommandStation } from '@/commandstation/useCommandStation';
-import { useExNativeInputBus } from '@/connections/ExEventBus';
 import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Empty from '@/core/components/ui/empty/Empty.vue';
@@ -18,61 +17,43 @@ import TableHeader from '@/core/components/ui/table/TableHeader.vue';
 import TableRow from '@/core/components/ui/table/TableRow.vue';
 import { useDialog } from '@/core/dialogs/core/useDialog';
 import AddSensorDialog from '@/sensors/AddSensorDialog.vue';
+import LocalSensorList from '@/sensors/LocalSensorList.vue';
+import type { SensorInfo } from '@/sensors/SensorInfo';
+import { useLocalSensorStore } from '@/sensors/useLocalSensorStore';
 import { FolderCode } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
-type SensorInfo = {
-  id: number;
-  value?: boolean;
-  config: {
-    vPin?: number;
-    pullUp?: boolean;
-  };
-};
-
 const cs = useCommandStation();
-const exNativeInputBus = useExNativeInputBus();
 
 const sensorInfos = ref(new Map<number, SensorInfo>());
-const localSensors = ref(new Map<number, SensorInfo>());
+const localSensorStore = useLocalSensorStore();
 
 const sensorInfoList = computed(() =>
-  Array.from(new Map([...sensorInfos.value, ...localSensors.value]).values()).sort(
-    (a, b) => a.id - b.id,
-  ),
+  Array.from(new Map(sensorInfos.value).values()).sort((a, b) => a.id - b.id),
 );
 
-exNativeInputBus.on((command) => {
-  if (command.command === 'Q') {
-    if (command.params.length === 1) {
-      const sensorId = +command.params[0];
-      setSensorValue(sensorId, true);
-    }
-    if (command.params.length === 3) {
-      const sensorId = +command.params[0];
-      const sensorVPin = +command.params[1];
-      const sensorPullUp = command.params[2] === '1';
-      const sensorInfo = sensorInfos.value.get(sensorId);
-      if (sensorInfo) {
-        sensorInfo.config.vPin = sensorVPin;
-        sensorInfo.config.pullUp = sensorPullUp;
-      } else {
-        sensorInfos.value.set(sensorId, {
-          id: sensorId,
-          value: true,
-          config: {
-            vPin: sensorVPin,
-            pullUp: sensorPullUp,
-          },
-        });
-      }
-    }
-  }
-  if (command.command === 'q') {
-    const sensorId = +command.params[0];
-    setSensorValue(sensorId, false);
-  }
-});
+async function fetchSensorList() {
+  const sensors = await cs.getSensorList();
+  const sensorInfoMap = new Map<number, SensorInfo>();
+  sensors.forEach((sensor) => {
+    sensorInfoMap.set(sensor.id, {
+      id: sensor.id,
+      value: undefined,
+      config: {
+        vPin: sensor.vPin,
+        pullUp: sensor.pullUp,
+      },
+    });
+  });
+  sensorInfos.value = sensorInfoMap;
+}
+
+async function fetchSensorValues() {
+  const sensorValues = await cs.getSensorValues();
+  sensorValues.forEach((sensor) => {
+    setSensorValue(sensor.id, sensor.value);
+  });
+}
 
 function setSensorValue(sensorId: number, value: boolean) {
   const sensorInfo = sensorInfos.value.get(sensorId);
@@ -93,20 +74,18 @@ async function addSensor() {
   const newSensorConfig = await dialog.show(AddSensorDialog, {});
   if (!newSensorConfig) return;
   const { sensorId, vPin, pullUp } = newSensorConfig;
-  localSensors.value.set(sensorId, {
+  localSensorStore.addSensor({
     id: sensorId,
-    config: {
-      vPin,
-      pullUp: pullUp === '1',
-    },
+    vPin,
+    pullUp: pullUp === '1',
   });
   cs.addSensor(sensorId, vPin, pullUp === '1');
   cs.refreshSensorList();
 }
 
-onMounted(() => {
-  cs.refreshSensorList();
-  cs.refreshSensorValues();
+onMounted(async () => {
+  await fetchSensorList();
+  await fetchSensorValues();
 });
 </script>
 
@@ -115,12 +94,17 @@ onMounted(() => {
     <PageTitle title="Sensors" />
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex gap-4">
-        <Button @click="cs.refreshSensorList()">Refresh Sensor List</Button>
-        <Button @click="cs.refreshSensorValues()">Refresh Sensor Values</Button>
+        <Button @click="() => fetchSensorList()">Refresh Sensor List</Button>
+        <Button @click="() => fetchSensorValues()">Refresh Sensor Values</Button>
       </div>
       <Button @click="addSensor">Add Sensor</Button>
     </Item>
     <div>
+      <h2 class="mb-2 text-lg font-semibold">Local Sensors</h2>
+      <LocalSensorList :sensors="localSensorStore.sensors" />
+    </div>
+    <div class="mt-8">
+      <h2 class="mb-2 text-lg font-semibold">CS Sensors</h2>
       <Table>
         <TableHeader>
           <TableRow>

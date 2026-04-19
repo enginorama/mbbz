@@ -41,7 +41,7 @@ onMounted(async () => {
       <FieldGroup>
         <Field>
           <FieldLabel for="sensorId"> Sensor ID </FieldLabel>
-          <NumberField id="sensorId" v-model="sensorId" :min="0">
+          <NumberField id="sensorId" v-model="sensorId" :min="0" :focus-on-change="false">
             <NumberFieldContent>
               <NumberFieldDecrement />
               <NumberFieldInput ref="firstInputRef" />
