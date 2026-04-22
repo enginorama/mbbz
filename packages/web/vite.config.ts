@@ -8,7 +8,7 @@ import VueRouter from 'vue-router/vite';
 
 export default defineConfig({
   plugins: [
-    VueRouter({ dts: 'src/typed-router.d.ts' }),
+    VueRouter({ dts: 'src/typed-router.d.ts', exclude: ['**/components/**'] }),
     vue(),
     tailwindcss(),
     vueDevTools(),
