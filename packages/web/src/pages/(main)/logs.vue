@@ -2,7 +2,7 @@
 import { useConnection } from '@/connections/ExConnection';
 import { useExStationOutputBus } from '@/connections/ExEventBus';
 import { useConnectionLogger } from '@/connections/useConnectionLogger';
-import PageTitle from '@/core/components/PageTitle.vue';
+import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Checkbox from '@/core/components/ui/checkbox/Checkbox.vue';
 import Input from '@/core/components/ui/input/Input.vue';
@@ -49,13 +49,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
-    <PageTitle title="Logs" subtitle="Serial protocol" />
-    <div class="w-full grow overflow-y-auto border border-gray-300 bg-gray-50 p-4">
+  <PageLayout title="Logs" subtitle="Serial protocol" :fill-content="true">
+    <div class="w-full grow overflow-y-auto border border-gray-300 bg-white p-4">
       <div v-for="(msg, index) in logMessages" :key="index" class="mb-1 flex gap-2">
-        <ArrowBigLeftDashIcon v-if="msg.type === 'OUT'" class="text-orange-500" />
-        <ArrowBigRightDashIcon v-if="msg.type === 'IN'" class="text-blue-500" />
-        <InfoIcon v-if="msg.type === 'INFO'" class="text-yellow-500" />
+        <ArrowBigLeftDashIcon v-if="msg.type === 'OUT'" class="shrink-0 text-orange-500" />
+        <ArrowBigRightDashIcon v-if="msg.type === 'IN'" class="shrink-0 text-blue-500" />
+        <InfoIcon v-if="msg.type === 'INFO'" class="shrink-0 text-yellow-500" />
         <div>{{ msg.message }}</div>
       </div>
       <span ref="scrollAnchor"></span>
@@ -66,7 +65,7 @@ onMounted(() => {
           type="text"
           v-model="messageToSend"
           placeholder="Type message to send to DCC, e.g. <s>"
-          class="input input-bordered w-full"
+          class="input input-bordered w-full bg-white"
           :class="{
             'focus-visible:ring-destructive/20 focus-visible:border-destructive/50': !connected,
           }"
@@ -79,5 +78,5 @@ onMounted(() => {
         <Label for="autoscroll">Auto scroll</Label>
       </div>
     </div>
-  </div>
+  </PageLayout>
 </template>

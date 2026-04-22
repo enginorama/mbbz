@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TurnoutEntry } from '@/commandstation/CommandStation';
 import { useCommandStation } from '@/commandstation/useCommandStation';
-import PageTitle from '@/core/components/PageTitle.vue';
+import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -24,8 +24,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <PageTitle title="Turnouts" subtitle="Manage your track switches" />
+  <PageLayout title="Turnouts" subtitle="Manage your track switches">
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex items-center gap-2"></div>
       <div class="flex gap-2">
@@ -42,5 +41,5 @@ onMounted(() => {
         <CardContent>{{ turnout.status }} </CardContent>
       </Card>
     </div>
-  </div>
+  </PageLayout>
 </template>

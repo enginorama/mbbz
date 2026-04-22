@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCommandStation } from '@/commandstation/useCommandStation';
-import PageTitle from '@/core/components/PageTitle.vue';
+import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Empty from '@/core/components/ui/empty/Empty.vue';
 import EmptyDescription from '@/core/components/ui/empty/EmptyDescription.vue';
@@ -90,8 +90,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <PageTitle title="Sensors" />
+  <PageLayout title="Sensors">
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex gap-4">
         <Button @click="() => fetchSensorList()">Refresh Sensor List</Button>
@@ -159,5 +158,5 @@ onMounted(async () => {
         "
       />
     </div>
-  </div>
+  </PageLayout>
 </template>

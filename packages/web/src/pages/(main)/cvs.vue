@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PageTitle from '@/core/components/PageTitle.vue';
+import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Item from '@/core/components/ui/item/Item.vue';
 import NumberField from '@/core/components/ui/number-field/NumberField.vue';
@@ -63,12 +63,12 @@ function downloadCsv() {
 </script>
 
 <template>
-  <div>
-    <PageTitle title="CVs" subtitle="Read and write CVs">
-      <Button variant="default" class="rounded-full"
-        ><PlusIcon class="h-6" />{{ $t('pages.cvs.addCv') }}</Button
-      >
-    </PageTitle>
+  <PageLayout title="CVs" subtitle="Read and write CVs">
+    <template #actions>
+      <Button variant="default" class="rounded-full">
+        <PlusIcon class="h-6" />{{ $t('pages.cvs.addCv') }}
+      </Button>
+    </template>
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex items-center gap-2">
         <NumberField v-model="cvAddressToAdd" :min="1" :max="1024" class="w-32 bg-white">
@@ -101,5 +101,5 @@ function downloadCsv() {
     <div class="mt-7">
       <CvTable :cvData="sortedCvs" />
     </div>
-  </div>
+  </PageLayout>
 </template>

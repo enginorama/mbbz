@@ -10,9 +10,7 @@ defineProps<{
 </script>
 
 <template>
-  <div
-    class="absolute top-0 right-0 left-0 flex h-14 items-center gap-4 border-b bg-white px-4 md:hidden"
-  >
+  <div class="flex h-14 shrink-0 items-center gap-4 border-b bg-white px-4 md:hidden">
     <Button @click="toggleSidebar" variant="ghost" size="icon">
       <MenuIcon></MenuIcon>
     </Button>

@@ -2,7 +2,7 @@
 import type { RosterEntry } from '@/commandstation/CommandStation';
 import { useRosterStore } from '@/commandstation/roster/useRosterStore';
 import { useCommandStation } from '@/commandstation/useCommandStation';
-import PageTitle from '@/core/components/PageTitle.vue';
+import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -43,8 +43,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <PageTitle title="Cabs" subtitle="Manage your rolling stock" />
+  <PageLayout title="Cabs" subtitle="Manage your rolling stock">
     <Card v-if="cabs.length > 0">
       <CardHeader>
         <CardTitle>Cabs</CardTitle>
@@ -85,5 +84,5 @@ onMounted(() => {
         </div>
       </EmptyContent>
     </Empty>
-  </div>
+  </PageLayout>
 </template>

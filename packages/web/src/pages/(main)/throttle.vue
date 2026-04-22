@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { NUM_CAB_FUNCTIONS } from '@/cabs/state/CabState';
 import { useCab } from '@/cabs/state/useCab';
+import PageLayout from '@/core/components/PageLayout.vue';
 import PageMenuBar from '@/core/components/PageMenuBar.vue';
-import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Item from '@/core/components/ui/item/Item.vue';
 import NumberField from '@/core/components/ui/number-field/NumberField.vue';
@@ -34,8 +34,7 @@ watch(address, () => {
 </script>
 
 <template>
-  <div>
-    <PageTitle title="Throttle" />
+  <PageLayout title="Throttle">
     <PageMenuBar>
       DCC Address
       <NumberField v-model="address" :min="1" :max="1024" class="w-32 bg-white">
@@ -98,5 +97,5 @@ watch(address, () => {
         ><ShieldAlertIcon
       /></Button>
     </Item>
-  </div>
+  </PageLayout>
 </template>

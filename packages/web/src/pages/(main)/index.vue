@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useConnection } from '@/connections/ExConnection';
 import { ExWebSerial } from '@/connections/transports/ExWebSerial';
-import PageTitle from '@/core/components/PageTitle.vue';
+import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -15,8 +15,7 @@ const isWebSerialSupported = ExWebSerial.isSupported;
 </script>
 
 <template>
-  <div>
-    <PageTitle title="Welcome to mbbz" subtitle="Manage and control your DCC-EX layout" />
+  <PageLayout title="Welcome to mbbz" subtitle="Manage and control your DCC-EX layout">
     <div>
       <Card class="max-w-120">
         <CardHeader>
@@ -67,5 +66,5 @@ const isWebSerialSupported = ExWebSerial.isSupported;
         </CardContent>
       </Card>
     </div>
-  </div>
+  </PageLayout>
 </template>
