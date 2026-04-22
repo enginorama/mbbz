@@ -17,7 +17,7 @@ defineProps<{
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>CV Table</CardTitle>
+      <CardTitle>{{ $t('cvs.cvTable.title') }}</CardTitle>
     </CardHeader>
     <CardContent
       class="px-0 **:data-[slot=table-cell]:first:px-6 **:data-[slot=table-head]:first:px-6"
@@ -25,12 +25,12 @@ defineProps<{
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Address</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Decimal</TableHead>
-            <TableHead>Hex</TableHead>
-            <TableHead>Binary</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>{{ $t('globals.address') }}</TableHead>
+            <TableHead>{{ $t('globals.title') }}</TableHead>
+            <TableHead>{{ $t('globals.numberFormat.decimal') }}</TableHead>
+            <TableHead>{{ $t('globals.numberFormat.hex') }}</TableHead>
+            <TableHead>{{ $t('globals.numberFormat.binary') }}</TableHead>
+            <TableHead>{{ $t('globals.actions') }}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

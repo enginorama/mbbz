@@ -66,7 +66,7 @@ onMounted(() => {
         }"
         @keyup.enter="send"
       />
-      <Button @click="send" :disabled="!connected"><SendIcon />Send</Button>
+      <Button @click="send" :disabled="!connected"><SendIcon />{{ $t('globals.send') }}</Button>
     </div>
   </div>
 </template>

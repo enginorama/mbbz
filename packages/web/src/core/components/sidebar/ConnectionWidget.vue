@@ -68,7 +68,7 @@ const connectionInfo = computed(() => ({
             <DropdownMenuItem as-child>
               <SidebarMenuButton @click="connect" :disabled="connecting">
                 <CableIcon />
-                Connect
+                {{ $t('globals.connect') }}
               </SidebarMenuButton>
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -89,7 +89,7 @@ const connectionInfo = computed(() => ({
           <DropdownMenuItem v-if="connected" as-child>
             <SidebarMenuButton @click="disconnect">
               <CableIcon />
-              Disconnect
+              {{ $t('globals.disconnect') }}
             </SidebarMenuButton>
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -65,7 +65,9 @@ function downloadCsv() {
 <template>
   <div>
     <PageTitle title="CVs" subtitle="Read and write CVs">
-      <Button variant="default" class="rounded-full"><PlusIcon class="h-6" />CV hinzufügen</Button>
+      <Button variant="default" class="rounded-full"
+        ><PlusIcon class="h-6" />{{ $t('pages.cvs.addCv') }}</Button
+      >
     </PageTitle>
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex items-center gap-2">
@@ -76,11 +78,11 @@ function downloadCsv() {
             <NumberFieldIncrement />
           </NumberFieldContent>
         </NumberField>
-        <Button variant="outline" @click="cvs.add(cvAddressToAdd)">Hinzufügen</Button>
+        <Button variant="outline" @click="cvs.add(cvAddressToAdd)">{{ $t('globals.add') }}</Button>
       </div>
       <div class="flex gap-2">
-        <Button @click="downloadCsv"><DownloadIcon /> CSV</Button>
-        <Button @click="refreshAllCvs">Refresh all</Button>
+        <Button @click="downloadCsv"><DownloadIcon />{{ $t('globals.fileFormats.csv') }}</Button>
+        <Button @click="refreshAllCvs">{{ $t('pages.cvs.refreshAll') }}</Button>
       </div>
     </Item>
     <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">

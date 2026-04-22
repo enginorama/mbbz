@@ -29,9 +29,9 @@ defineProps<{
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogCancel>{{ $t('globals.cancel') }}</AlertDialogCancel>
         <AlertDialogAction as-child>
-          <Button variant="destructive">Continue</Button>
+          <Button variant="destructive">{{ $t('globals.continue') }}</Button>
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
