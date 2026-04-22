@@ -4,6 +4,7 @@ import { useExStationOutputBus } from '@/connections/ExEventBus';
 import { useConnectionLogger } from '@/connections/useConnectionLogger';
 import PageTitle from '@/core/components/PageTitle.vue';
 import Button from '@/core/components/ui/button/Button.vue';
+import Checkbox from '@/core/components/ui/checkbox/Checkbox.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import { ArrowBigLeftDashIcon, ArrowBigRightDashIcon, InfoIcon, SendIcon } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
@@ -13,6 +14,7 @@ const outputBus = useExStationOutputBus();
 const { logMessages } = useConnectionLogger();
 
 const scrollAnchorRef = useTemplateRef<HTMLElement>('scrollAnchor');
+const autoScrollEnabled = ref(true);
 
 const { connected } = useConnection();
 
@@ -30,8 +32,11 @@ function send() {
 }
 
 watch(
-  () => logMessages.value,
+  () => [logMessages.value, autoScrollEnabled.value],
   async () => {
+    if (!autoScrollEnabled.value) {
+      return;
+    }
     await nextTick();
     scrollAnchorRef.value?.scrollIntoView({ behavior: 'smooth' });
   },
@@ -55,18 +60,24 @@ onMounted(() => {
       </div>
       <span ref="scrollAnchor"></span>
     </div>
-    <div class="mb-4 flex gap-2 py-4">
-      <Input
-        type="text"
-        v-model="messageToSend"
-        placeholder="Type message to send to DCC"
-        class="input input-bordered w-full"
-        :class="{
-          'focus-visible:ring-destructive/20 focus-visible:border-destructive/50': !connected,
-        }"
-        @keyup.enter="send"
-      />
-      <Button @click="send" :disabled="!connected"><SendIcon />{{ $t('globals.send') }}</Button>
+    <div class="mt-6">
+      <div class="mb-2 flex gap-2">
+        <Input
+          type="text"
+          v-model="messageToSend"
+          placeholder="Type message to send to DCC, e.g. <s>"
+          class="input input-bordered w-full"
+          :class="{
+            'focus-visible:ring-destructive/20 focus-visible:border-destructive/50': !connected,
+          }"
+          @keyup.enter="send"
+        />
+        <Button @click="send" :disabled="!connected"><SendIcon />{{ $t('globals.send') }}</Button>
+      </div>
+      <div class="flex items-center gap-3">
+        <Checkbox id="autoscroll" v-model="autoScrollEnabled" />
+        <Label for="autoscroll">Auto scroll</Label>
+      </div>
     </div>
   </div>
 </template>
