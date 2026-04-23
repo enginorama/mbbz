@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
 import { useConnection } from '@/connections/ExConnection';
 import { ExWebSerial } from '@/connections/transports/ExWebSerial';
 import PageLayout from '@/core/components/PageLayout.vue';
@@ -12,11 +13,12 @@ import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
 
 const { connected, connect, connecting, disconnect } = useConnection();
 const isWebSerialSupported = ExWebSerial.isSupported;
+const commandStationStatusStore = useCommandStationStatusStore();
 </script>
 
 <template>
   <PageLayout title="Welcome to mbbz" subtitle="Manage and control your DCC-EX layout">
-    <div>
+    <div class="flex flex-col gap-8">
       <Card class="max-w-120">
         <CardHeader>
           <CardTitle>Connect your EX-CommandStation</CardTitle>
@@ -63,6 +65,22 @@ const isWebSerialSupported = ExWebSerial.isSupported;
           >
             Disconnect
           </Button>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Command Station Info</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul>
+            <li v-if="commandStationStatusStore.info">
+              <div>Version: {{ commandStationStatusStore.info.version }}</div>
+              <div>Board Type: {{ commandStationStatusStore.info.boardType }}</div>
+              <div>Motor Shield: {{ commandStationStatusStore.info.motorShield }}</div>
+              <div>Build Number: {{ commandStationStatusStore.info.buildNumber }}</div>
+            </li>
+            <li v-else class="text-gray-500">No command station info available.</li>
+          </ul>
         </CardContent>
       </Card>
     </div>

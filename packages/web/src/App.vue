@@ -2,6 +2,7 @@
 import { ref, useTemplateRef } from 'vue';
 import { RouterView } from 'vue-router';
 import { setupCabStateSync } from './cabs/state/setupCabStateSync';
+import { provideCommandStationInfoSync } from './commandstation/provideCommandStationInfoSync';
 import { setupBusLogger, setupDccInputBus } from './connections/ExConnection';
 import { provideWebSerialConnection } from './connections/transports/provideWebSerialConnection';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
@@ -11,6 +12,7 @@ import { provideDialog } from './core/dialogs/core/useDialog';
 setupBusLogger();
 setupDccInputBus();
 setupCabStateSync();
+provideCommandStationInfoSync();
 
 const isAnyDialogOpen = ref(false);
 

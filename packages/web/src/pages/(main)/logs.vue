@@ -6,6 +6,7 @@ import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Checkbox from '@/core/components/ui/checkbox/Checkbox.vue';
 import Input from '@/core/components/ui/input/Input.vue';
+import Label from '@/core/components/ui/label/Label.vue';
 import { ArrowBigLeftDashIcon, ArrowBigRightDashIcon, InfoIcon, SendIcon } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 
