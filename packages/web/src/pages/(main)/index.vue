@@ -67,7 +67,7 @@ const commandStationStatusStore = useCommandStationStatusStore();
           </Button>
         </CardContent>
       </Card>
-      <Card>
+      <Card class="max-w-120">
         <CardHeader>
           <CardTitle>Command Station Info</CardTitle>
         </CardHeader>
