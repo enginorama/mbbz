@@ -184,6 +184,9 @@ export class CommandStation {
     });
   }
 
+  /**
+   * Sends a command and waits until the callback returns a non-undefined value or the timeout is reached.
+   */
   private async sendAndWaitForResponse<T>({
     command,
     callback,
@@ -216,6 +219,10 @@ export class CommandStation {
     });
   }
 
+  /**
+   * Sends a command and collects all responses until the callback only returns undefined values
+   * for a certain period of time.
+   */
   private async sendAndCollectResponses<T>({
     command,
     callback,

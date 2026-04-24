@@ -4,6 +4,7 @@ export type CabDirection = 'forward' | 'reverse';
 
 export interface CabState {
   dccAddress: number;
+  /** Legacy, no longer used */
   slot: number;
   isEmergencyStopped: boolean;
   direction: CabDirection;

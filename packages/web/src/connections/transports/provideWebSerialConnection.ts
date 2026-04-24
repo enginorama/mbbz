@@ -3,11 +3,14 @@ import { toast } from 'vue-sonner';
 import { connectionInjectionKey } from '../ExConnection';
 import { useExStationInputBus, useExStationOutputBus } from '../ExEventBus';
 import { useConnectionLogger } from '../useConnectionLogger';
+import { useTransportStatusStore } from './useTransportStatusStore';
 import { useWebSerial } from './useWebSerial';
 
 export function provideWebSerialConnection() {
   const inputBus = useExStationInputBus();
   const outputBus = useExStationOutputBus();
+  const transportStatusStore = useTransportStatusStore();
+
   const { log } = useConnectionLogger();
   const connecting = ref(false);
 
@@ -41,8 +44,10 @@ export function provideWebSerialConnection() {
 
   watch(connected, (newVal) => {
     if (newVal) {
+      transportStatusStore.setStatus('webSerial', 'connected');
       log({ type: 'INFO', message: 'Connected.' });
     } else {
+      transportStatusStore.setStatus('webSerial', 'disconnected');
       log({ type: 'INFO', message: 'Disconnected.' });
     }
   });
