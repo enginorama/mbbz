@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useConnection } from '@/connections/ExConnection';
+import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import {
   DropdownMenu,
@@ -15,17 +16,27 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/core/components/ui/sidebar';
-import { CableIcon, ChevronsUpDown, LogsIcon, SettingsIcon, UnplugIcon } from 'lucide-vue-next';
+import { CableIcon, ChevronsUpDown, UnplugIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 const { isMobile } = useSidebar();
 
 const { connected, connect, disconnect, connecting } = useConnection();
 
+const { isConnected: websocketConnected, isConnecting: isWebSocketConnecting } =
+  useWebSocketTransport();
+
 const connectionInfo = computed(() => ({
-  status: connected.value ? 'connected' : connecting.value ? 'connecting' : 'disconnected',
-  protocol: 'dcc-ex',
-  type: 'Serial',
+  status:
+    connected.value || websocketConnected.value
+      ? 'connected'
+      : connecting.value || isWebSocketConnecting.value
+        ? 'connecting'
+        : 'disconnected',
+  type:
+    [connected.value ? 'Serial' : null, websocketConnected.value ? 'WebSocket' : null]
+      .filter(Boolean)
+      .join(', ') || 'No connection',
 }));
 </script>
 <template>
@@ -68,28 +79,15 @@ const connectionInfo = computed(() => ({
             <DropdownMenuItem as-child>
               <SidebarMenuButton @click="connect" :disabled="connecting">
                 <CableIcon />
-                {{ $t('globals.connect') }}
+                {{ $t('globals.connect') }} Serial
               </SidebarMenuButton>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem as-child>
-              <RouterLink :to="{ name: '/(main)/logs' }">
-                <LogsIcon />
-                Logs
-              </RouterLink>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <SettingsIcon />
-              Config
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator v-if="!connected" />
+          <DropdownMenuSeparator v-if="connected" />
           <DropdownMenuItem v-if="connected" as-child>
             <SidebarMenuButton @click="disconnect">
               <CableIcon />
-              {{ $t('globals.disconnect') }}
+              {{ $t('globals.disconnect') }} Serial
             </SidebarMenuButton>
           </DropdownMenuItem>
         </DropdownMenuContent>

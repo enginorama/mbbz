@@ -13,6 +13,7 @@ import {
   GamepadDirectionalIcon,
   GaugeIcon,
   HomeIcon,
+  LogsIcon,
   ServerCogIcon,
   SplitIcon,
   TrainFrontIcon,
@@ -115,6 +116,22 @@ const navItems = computed<NavItem[]>(() => {
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
+      <SidebarMenu class="gap-3">
+        <SidebarMenuItem>
+          <SidebarMenuButton as-child size="lg">
+            <RouterLink
+              :to="{ name: '/(main)/logs' }"
+              @click="closeIfMobile"
+              class="flex items-center gap-3 rounded-lg px-3 py-2"
+            >
+              <div class="flex aspect-square size-8 items-center justify-center">
+                <LogsIcon />
+              </div>
+              <span>{{ $t('sidebar.logs') }}</span>
+            </RouterLink>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
       <ConnectionWidget />
     </SidebarFooter>
     <SidebarRail />

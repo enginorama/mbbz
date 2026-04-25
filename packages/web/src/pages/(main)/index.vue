@@ -12,15 +12,15 @@ import CardHeader from '@/core/components/ui/card/CardHeader.vue';
 import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
+import { useStorage } from '@vueuse/core';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
-import { ref } from 'vue';
 
 const { connect, connected, connecting, disconnect } = useConnection();
 const isWebSerialSupported = ExWebSerial.isSupported;
 const commandStationStatusStore = useCommandStationStatusStore();
 const transportStatusStore = useTransportStatusStore();
 
-const websocketAddress = ref('ws://192.168.0.150/ws');
+const websocketAddress = useStorage('websocketAddress', 'ws://dccex.local:2560');
 
 const {
   connect: connectWebSocket,

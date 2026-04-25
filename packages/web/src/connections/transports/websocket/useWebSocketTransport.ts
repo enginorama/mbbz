@@ -36,7 +36,7 @@ export const provideWebSocketTransport = () => {
     }
     connecting.value = true;
     try {
-      socket.value = new WebSocket(url);
+      socket.value = new WebSocket(url, 'DCCEX');
       socket.value.addEventListener('open', () => {
         transportStatusStore.setStatus('websocket', 'connected');
         isConnected.value = true;
@@ -83,13 +83,17 @@ export const provideWebSocketTransport = () => {
     }
   });
 
+  function disconnect() {
+    if (socket.value) {
+      console.log('Closing WebSocket connection');
+      socket.value.close();
+      console.log(socket.value.readyState);
+    }
+  }
+
   provide(websocketTransportInjectionKey, {
     connect,
-    disconnect: () => {
-      if (socket.value) {
-        socket.value.close();
-      }
-    },
+    disconnect,
     isConnected: readonly(isConnected),
     isConnecting: readonly(connecting),
   });
