@@ -1,4 +1,4 @@
-import type { DccExCommand } from '@/protocols/DccEx';
+import type { DccExCommand } from '@/protocols/ExNativeTokenizer';
 import { useEventBus, type EventBusKey } from '@vueuse/core';
 
 const exStationInputBus: EventBusKey<string> = Symbol('ex-station-input-bus');

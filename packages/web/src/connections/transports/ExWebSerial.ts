@@ -1,3 +1,5 @@
+import { ExNativeNormalizer } from '@/protocols/ExNativeNormalizer';
+
 export type WebSerialConfig = {
   port: SerialPort;
 };
@@ -71,9 +73,7 @@ export class ExWebSerial {
     this.inputDone = (this.port.readable as unknown as ReadableStream<BufferSource>).pipeTo(
       decoder.writable,
     );
-    this.inputStream = decoder.readable.pipeThrough(
-      new TransformStream(new LineBreakTransformer()),
-    );
+    this.inputStream = decoder.readable.pipeThrough(new TransformStream(new ExNativeTransformer()));
     this.reader = this.inputStream.getReader();
     this.setConnected(true);
     void this.readLoop();
@@ -134,19 +134,10 @@ export class ExWebSerial {
   }
 }
 
-class LineBreakTransformer implements Transformer<string, string> {
-  private container = '';
+class ExNativeTransformer implements Transformer<string, string> {
+  private container = new ExNativeNormalizer(() => {});
 
   public transform(chunk: string, controller: TransformStreamDefaultController<string>) {
-    // Handle incoming chunk
-    this.container += chunk; // add new data to the container
-    const lines = this.container.split('\n'); // look for line breaks and if it finds any
-    this.container = lines.pop() ?? ''; // split them into an array
-    lines.forEach((line) => controller.enqueue(line)); // iterate parsed lines and send them
-  }
-
-  public flush(controller: TransformStreamDefaultController<string>) {
-    // When the stream is closed, flush any remaining data
-    controller.enqueue(this.container);
+    this.container.parseChunk(chunk, (line) => controller.enqueue(line));
   }
 }

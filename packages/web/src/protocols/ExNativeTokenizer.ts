@@ -3,7 +3,7 @@ export type DccExCommand = {
   params: string[];
 };
 
-export function parseDccExString(input: string) {
+export function tokenizeExNativeString(input: string) {
   const lines = [...input.matchAll(/<(.*?)>/gm)].map((r) => r[1]);
   const output: DccExCommand[] = [];
 

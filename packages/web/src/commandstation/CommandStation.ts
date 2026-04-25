@@ -1,6 +1,6 @@
 import { useExNativeInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
 import { Queue } from '@/lib/queue';
-import type { DccExCommand } from '@/protocols/DccEx';
+import type { DccExCommand } from '@/protocols/ExNativeTokenizer';
 
 export interface RosterEntry {
   address: number;

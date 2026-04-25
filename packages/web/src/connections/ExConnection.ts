@@ -1,4 +1,4 @@
-import { parseDccExString } from '@/protocols/DccEx';
+import { tokenizeExNativeString } from '@/protocols/ExNativeTokenizer';
 import { inject, type InjectionKey, type Ref } from 'vue';
 import { useExNativeInputBus, useExStationInputBus, useExStationOutputBus } from './ExEventBus';
 import { useConnectionLogger } from './useConnectionLogger';
@@ -37,7 +37,7 @@ export function setupDccInputBus() {
   const inputBus = useExStationInputBus();
 
   inputBus.on((data) => {
-    const packets = parseDccExString(data);
+    const packets = tokenizeExNativeString(data);
     packets.forEach((packet) => {
       dccInputBus.emit(packet);
     });
