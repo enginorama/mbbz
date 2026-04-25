@@ -1,5 +1,3 @@
-import { ExNativeNormalizer } from '@/protocols/ExNativeNormalizer';
-
 export type WebSerialConfig = {
   port: SerialPort;
 };
@@ -11,7 +9,6 @@ export class ExWebSerial {
   private outputStream: WritableStream<string> | null = null;
   private outputDone: Promise<void> | null = null;
   private inputDone: Promise<void> | null = null;
-  private inputStream: ReadableStream<string> | null = null;
   private reader: ReadableStreamDefaultReader<string> | null = null;
 
   public static get isSupported() {
@@ -73,8 +70,7 @@ export class ExWebSerial {
     this.inputDone = (this.port.readable as unknown as ReadableStream<BufferSource>).pipeTo(
       decoder.writable,
     );
-    this.inputStream = decoder.readable.pipeThrough(new TransformStream(new ExNativeTransformer()));
-    this.reader = this.inputStream.getReader();
+    this.reader = decoder.readable.getReader();
     this.setConnected(true);
     void this.readLoop();
     return true;
@@ -131,13 +127,5 @@ export class ExWebSerial {
     this.connected = connected;
     const status: WebSerialConnectionStatus = connected ? 'connected' : 'disconnected';
     this.onConnectionStatusChange(status);
-  }
-}
-
-class ExNativeTransformer implements Transformer<string, string> {
-  private container = new ExNativeNormalizer(() => {});
-
-  public transform(chunk: string, controller: TransformStreamDefaultController<string>) {
-    this.container.parseChunk(chunk, (line) => controller.enqueue(line));
   }
 }

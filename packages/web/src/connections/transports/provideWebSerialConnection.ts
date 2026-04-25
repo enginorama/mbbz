@@ -1,3 +1,4 @@
+import { ExNativeNormalizer } from '@/protocols/ExNativeNormalizer';
 import { onUnmounted, provide, readonly, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { connectionInjectionKey } from '../ExConnection';
@@ -10,12 +11,15 @@ export function provideWebSerialConnection() {
   const inputBus = useExStationInputBus();
   const outputBus = useExStationOutputBus();
   const transportStatusStore = useTransportStatusStore();
+  const normalizer = new ExNativeNormalizer();
 
   const { log } = useConnectionLogger();
   const connecting = ref(false);
 
   const { open, close, connected, writeToStream, getPorts } = useWebSerial((msg) => {
-    inputBus.emit(msg);
+    normalizer.parseChunk(msg, (line) => {
+      inputBus.emit(line);
+    });
   });
 
   outputBus.on((msg) => {
