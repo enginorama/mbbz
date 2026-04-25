@@ -11,6 +11,9 @@ import CardContent from '@/core/components/ui/card/CardContent.vue';
 import CardHeader from '@/core/components/ui/card/CardHeader.vue';
 import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import Input from '@/core/components/ui/input/Input.vue';
+import Item from '@/core/components/ui/item/Item.vue';
+import ItemContent from '@/core/components/ui/item/ItemContent.vue';
+import ItemTitle from '@/core/components/ui/item/ItemTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { useStorage } from '@vueuse/core';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
@@ -93,11 +96,21 @@ const connectWebSocketHandler = () => {
             v-if="!isWebSocketConnected"
             :disabled="isWebSocketConnecting"
           >
-            Connect to WebSocket Server {{ isWebSocketConnecting }}
+            Connect to WebSocket Server
           </Button>
           <Button @click="disconnectWebSocket" v-if="isWebSocketConnected" variant="outline">
             Disconnect from WebSocket Server
           </Button>
+          <Item>
+            <ItemContent>
+              <ItemTitle><TriangleAlertIcon />Note</ItemTitle>
+              <div>
+                If you access this page online, you will most likely not be able to connect to your
+                local command station because of browser security restrictions.
+              </div>
+              <div>Right now, this is only for local testing.</div>
+            </ItemContent>
+          </Item>
         </CardContent>
       </Card>
       <Card class="max-w-120">
