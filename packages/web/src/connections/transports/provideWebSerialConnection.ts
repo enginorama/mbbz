@@ -1,4 +1,4 @@
-import { ExNativeNormalizer } from '@/protocols/ExNativeNormalizer';
+import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
 import { onUnmounted, provide, readonly, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { connectionInjectionKey } from '../ExConnection';
@@ -11,19 +11,23 @@ export function provideWebSerialConnection() {
   const inputBus = useExStationInputBus();
   const outputBus = useExStationOutputBus();
   const transportStatusStore = useTransportStatusStore();
-  const normalizer = new ExNativeNormalizer();
 
   const { log } = useConnectionLogger();
+
+  const normalizer = new ExNativeNormalizer((line) => {
+    log({ type: 'IN', message: line, transport: 'webSerial' });
+    inputBus.emit(line);
+  });
+
   const connecting = ref(false);
 
   const { open, close, connected, writeToStream, getPorts } = useWebSerial((msg) => {
-    normalizer.parseChunk(msg, (line) => {
-      inputBus.emit(line);
-    });
+    normalizer.parseChunk(msg);
   });
 
   outputBus.on((msg) => {
     if (connected.value) {
+      log({ type: 'OUT', message: msg, transport: 'webSerial' });
       void writeToStream(msg);
     }
   });
@@ -49,10 +53,10 @@ export function provideWebSerialConnection() {
   watch(connected, (newVal) => {
     if (newVal) {
       transportStatusStore.setStatus('webSerial', 'connected');
-      log({ type: 'INFO', message: 'Connected.' });
+      log({ type: 'INFO', message: 'Connected.', transport: 'webSerial' });
     } else {
       transportStatusStore.setStatus('webSerial', 'disconnected');
-      log({ type: 'INFO', message: 'Disconnected.' });
+      log({ type: 'INFO', message: 'Disconnected.', transport: 'webSerial' });
     }
   });
 

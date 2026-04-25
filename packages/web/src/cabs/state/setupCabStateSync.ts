@@ -1,5 +1,5 @@
 import { useExNativeInputBus } from '@/connections/ExEventBus';
-import type { DccExCommand } from '@/protocols/ExNativeTokenizer';
+import type { DccExCommand } from '@/ex-native/ExNativeTokenizer';
 import { NUM_CAB_FUNCTIONS, type CabDirection } from './CabState';
 import { useCabStatesStore } from './useCabStatesStore';
 

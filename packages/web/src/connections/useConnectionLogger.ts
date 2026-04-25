@@ -3,6 +3,7 @@ import { shallowRef } from 'vue';
 type ConnectionLogMessage = {
   type: 'IN' | 'OUT' | 'INFO';
   message: string;
+  transport: string;
 };
 
 const logMessages = shallowRef<ConnectionLogMessage[]>([]);

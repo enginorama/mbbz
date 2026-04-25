@@ -1,13 +1,20 @@
 <script setup lang="ts">
-import { useConnection } from '@/connections/ExConnection';
 import { useExStationOutputBus } from '@/connections/ExEventBus';
+import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import { useConnectionLogger } from '@/connections/useConnectionLogger';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Checkbox from '@/core/components/ui/checkbox/Checkbox.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import Label from '@/core/components/ui/label/Label.vue';
-import { ArrowBigLeftDashIcon, ArrowBigRightDashIcon, InfoIcon, SendIcon } from 'lucide-vue-next';
+import {
+  ArrowBigLeftDashIcon,
+  ArrowBigRightDashIcon,
+  CableIcon,
+  CloudIcon,
+  InfoIcon,
+  SendIcon,
+} from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 
 const outputBus = useExStationOutputBus();
@@ -17,12 +24,12 @@ const { logMessages } = useConnectionLogger();
 const scrollAnchorRef = useTemplateRef<HTMLElement>('scrollAnchor');
 const autoScrollEnabled = ref(true);
 
-const { connected } = useConnection();
+const transoportStatusStore = useTransportStatusStore();
 
 const messageToSend = ref('');
 
 function send() {
-  if (!connected.value) {
+  if (!transoportStatusStore.isConnected) {
     return;
   }
   if (messageToSend.value.trim() === '') {
@@ -53,6 +60,8 @@ onMounted(() => {
   <PageLayout title="Logs" subtitle="Serial protocol" :fill-content="true">
     <div class="w-full grow overflow-y-auto border border-gray-300 bg-white p-4">
       <div v-for="(msg, index) in logMessages" :key="index" class="mb-1 flex gap-2">
+        <CableIcon v-if="msg.transport === 'webSerial'" class="shrink-0 text-green-500" />
+        <CloudIcon v-if="msg.transport === 'websocket'" class="shrink-0 text-blue-500" />
         <ArrowBigLeftDashIcon v-if="msg.type === 'OUT'" class="shrink-0 text-orange-500" />
         <ArrowBigRightDashIcon v-if="msg.type === 'IN'" class="shrink-0 text-blue-500" />
         <InfoIcon v-if="msg.type === 'INFO'" class="shrink-0 text-yellow-500" />
@@ -68,11 +77,14 @@ onMounted(() => {
           placeholder="Type message to send to DCC, e.g. <s>"
           class="input input-bordered w-full bg-white"
           :class="{
-            'focus-visible:ring-destructive/20 focus-visible:border-destructive/50': !connected,
+            'focus-visible:ring-destructive/20 focus-visible:border-destructive/50':
+              !transoportStatusStore.isConnected,
           }"
           @keyup.enter="send"
         />
-        <Button @click="send" :disabled="!connected"><SendIcon />{{ $t('globals.send') }}</Button>
+        <Button @click="send" :disabled="!transoportStatusStore.isConnected"
+          ><SendIcon />{{ $t('globals.send') }}</Button
+        >
       </div>
       <div class="flex items-center gap-3">
         <Checkbox id="autoscroll" v-model="autoScrollEnabled" />

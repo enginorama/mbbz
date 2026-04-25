@@ -2,18 +2,36 @@
 import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
 import { useConnection } from '@/connections/ExConnection';
 import { ExWebSerial } from '@/connections/transports/ExWebSerial';
+import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
+import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
 import CardHeader from '@/core/components/ui/card/CardHeader.vue';
 import CardTitle from '@/core/components/ui/card/CardTitle.vue';
+import Input from '@/core/components/ui/input/Input.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
+import { ref } from 'vue';
 
-const { connected, connect, connecting, disconnect } = useConnection();
+const { connect, connected, connecting, disconnect } = useConnection();
 const isWebSerialSupported = ExWebSerial.isSupported;
 const commandStationStatusStore = useCommandStationStatusStore();
+const transportStatusStore = useTransportStatusStore();
+
+const websocketAddress = ref('ws://192.168.0.150/ws');
+
+const {
+  connect: connectWebSocket,
+  disconnect: disconnectWebSocket,
+  isConnected: isWebSocketConnected,
+  isConnecting: isWebSocketConnecting,
+} = useWebSocketTransport();
+
+const connectWebSocketHandler = () => {
+  connectWebSocket(websocketAddress.value);
+};
 </script>
 
 <template>
@@ -37,13 +55,6 @@ const commandStationStatusStore = useCommandStationStatusStore();
             <template v-if="isWebSerialSupported">
               <li class="mt-2 flex items-start gap-2">
                 <CheckIcon class="text-green-500" /> Web Serial API is available.
-              </li>
-              <li v-if="connected" class="mt-2 flex items-start gap-2">
-                <CheckIcon class="mr-2 inline h-5 w-5 text-green-500" /> EX-CommandStation is
-                connected.
-              </li>
-              <li v-if="!connected" class="mt-2 flex items-start gap-2 text-yellow-500">
-                <CloudAlertIcon /> EX-CommandStation is not connected.
               </li>
             </template>
           </ul>
@@ -69,9 +80,40 @@ const commandStationStatusStore = useCommandStationStatusStore();
       </Card>
       <Card class="max-w-120">
         <CardHeader>
+          <CardTitle>WebSocket Connection</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input
+            class="mb-4"
+            v-model="websocketAddress"
+            :disabled="isWebSocketConnecting || isWebSocketConnected"
+          />
+          <Button
+            @click="connectWebSocketHandler"
+            v-if="!isWebSocketConnected"
+            :disabled="isWebSocketConnecting"
+          >
+            Connect to WebSocket Server {{ isWebSocketConnecting }}
+          </Button>
+          <Button @click="disconnectWebSocket" v-if="isWebSocketConnected" variant="outline">
+            Disconnect from WebSocket Server
+          </Button>
+        </CardContent>
+      </Card>
+      <Card class="max-w-120">
+        <CardHeader>
           <CardTitle>Command Station Info</CardTitle>
         </CardHeader>
         <CardContent>
+          <ul class="mb-4">
+            <li v-if="transportStatusStore.isConnected" class="mt-2 flex items-start gap-2">
+              <CheckIcon class="mr-2 inline h-5 w-5 text-green-500" /> EX-CommandStation is
+              connected.
+            </li>
+            <li v-else class="mt-2 flex items-start gap-2 text-yellow-500">
+              <CloudAlertIcon /> EX-CommandStation is not connected.
+            </li>
+          </ul>
           <ul>
             <li v-if="commandStationStatusStore.info">
               <div>Version: {{ commandStationStatusStore.info.version }}</div>
