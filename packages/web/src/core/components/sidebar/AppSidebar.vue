@@ -14,6 +14,7 @@ import {
   GaugeIcon,
   HomeIcon,
   LogsIcon,
+  Repeat1Icon,
   ServerCogIcon,
   SplitIcon,
   TrainFrontIcon,
@@ -64,6 +65,11 @@ const navItems = computed<NavItem[]>(() => {
       label: 'sidebar.sensors',
       icon: GamepadDirectionalIcon,
       to: { name: '/(main)/sensors' },
+    },
+    {
+      label: 'sidebar.exrail',
+      icon: Repeat1Icon,
+      to: { name: '/(main)/exrail' },
     },
     {
       label: 'sidebar.cvs',

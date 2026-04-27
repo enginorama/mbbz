@@ -38,6 +38,7 @@ declare module 'vue-router/auto-routes' {
       | '/(main)/'
       | '/(main)/cabs/'
       | '/(main)/cvs'
+      | '/(main)/exrail'
       | '/(main)/logs'
       | '/(main)/sensors'
       | '/(main)/throttle'
@@ -60,6 +61,13 @@ declare module 'vue-router/auto-routes' {
     '/(main)/cvs': RouteRecordInfo<
       '/(main)/cvs',
       '/cvs',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/(main)/exrail': RouteRecordInfo<
+      '/(main)/exrail',
+      '/exrail',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -118,6 +126,7 @@ declare module 'vue-router/auto-routes' {
         | '/(main)/'
         | '/(main)/cabs/'
         | '/(main)/cvs'
+        | '/(main)/exrail'
         | '/(main)/logs'
         | '/(main)/sensors'
         | '/(main)/throttle'
@@ -140,6 +149,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/(main)/cvs.vue': {
       routes:
         | '/(main)/cvs'
+      views:
+        | never
+    }
+    'src/pages/(main)/exrail.vue': {
+      routes:
+        | '/(main)/exrail'
       views:
         | never
     }
