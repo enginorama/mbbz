@@ -1,7 +1,8 @@
 import { useExNativeInputBus } from '@/connections/ExEventBus';
+import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { useCommandStationStatusStore } from './useCommandStationStatusStore';
 
-export function provideCommandStationInfoSync() {
+export function provideCommandStationStatusSync() {
   const exNativeInputBus = useExNativeInputBus();
   const commandStationStatusStore = useCommandStationStatusStore();
 
@@ -13,6 +14,13 @@ export function provideCommandStationInfoSync() {
         motorShield: command.params[4] ?? '',
         buildNumber: command.params[5] ?? '',
       });
+      return;
+    }
+
+    const sensorStatus = parseSensorStatus(command);
+    if (sensorStatus) {
+      commandStationStatusStore.setSensorStatus(sensorStatus);
+      return;
     }
   });
 }

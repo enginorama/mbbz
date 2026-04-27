@@ -1,5 +1,6 @@
 import { useExNativeInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
 import type { DccExCommand } from '@/ex-native/ExNativeTokenizer';
+import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { Queue } from '@/lib/queue';
 
 export interface RosterEntry {
@@ -149,14 +150,7 @@ export class CommandStation {
   public async getSensorValues(): Promise<Array<CsSensorValue>> {
     return this.sendAndCollectResponses<CsSensorValue>({
       command: '<Q>',
-      callback: (packet) => {
-        if ((packet.command === 'Q' || packet.command === 'q') && packet.params.length === 1) {
-          return {
-            id: +packet.params[0],
-            value: packet.command === 'Q',
-          };
-        }
-      },
+      callback: parseSensorStatus,
     });
   }
 
@@ -193,14 +187,14 @@ export class CommandStation {
     defaultValue,
   }: {
     command: string;
-    callback: (command: DccExCommand) => T | undefined;
+    callback: (command: DccExCommand) => T | undefined | null;
     defaultValue: T;
   }): Promise<T> {
     return this.queue.add(async () => {
       const fetchedValue = await new Promise<T>((resolve, reject) => {
         const off = this.dccInputBus.on((packet) => {
           const value = callback(packet);
-          if (value !== undefined) {
+          if (value != null) {
             off();
             resolve(value);
           }
@@ -228,7 +222,7 @@ export class CommandStation {
     callback,
   }: {
     command: string;
-    callback: (command: DccExCommand) => T | undefined;
+    callback: (command: DccExCommand) => T | undefined | null;
   }): Promise<Array<T>> {
     return this.queue.add(async () => {
       const fetchedValues: Array<T> = [];
@@ -245,7 +239,7 @@ export class CommandStation {
 
         const off = this.dccInputBus.on((packet) => {
           const value = callback(packet);
-          if (value !== undefined) {
+          if (value != null) {
             fetchedValues.push(value);
             resetTimeout();
           }

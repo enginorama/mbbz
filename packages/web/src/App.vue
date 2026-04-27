@@ -2,7 +2,7 @@
 import { ref, useTemplateRef } from 'vue';
 import { RouterView } from 'vue-router';
 import { setupCabStateSync } from './cabs/state/setupCabStateSync';
-import { provideCommandStationInfoSync } from './commandstation/provideCommandStationInfoSync';
+import { provideCommandStationStatusSync } from './commandstation/provideCommandStationStatusSync';
 import { setupDccInputBus } from './connections/ExConnection';
 import { provideWebSerialTransport } from './connections/transports/serial/provideWebSerialTransport';
 import { provideWebSocketTransport } from './connections/transports/websocket/useWebSocketTransport';
@@ -12,7 +12,7 @@ import { provideDialog } from './core/dialogs/core/useDialog';
 
 setupDccInputBus();
 setupCabStateSync();
-provideCommandStationInfoSync();
+provideCommandStationStatusSync();
 
 const isAnyDialogOpen = ref(false);
 

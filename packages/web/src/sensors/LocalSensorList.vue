@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCommandStation } from '@/commandstation/useCommandStation';
+import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
 import Button from '@/core/components/ui/button/Button.vue';
 import Empty from '@/core/components/ui/empty/Empty.vue';
 import EmptyDescription from '@/core/components/ui/empty/EmptyDescription.vue';
@@ -21,6 +22,7 @@ defineProps<{
 
 const cs = useCommandStation();
 const localSensorStore = useLocalSensorStore();
+const commandStationStatusStore = useCommandStationStatusStore();
 
 function removeLocalSensor(id: number) {
   localSensorStore.removeSensor(id);
@@ -46,6 +48,7 @@ function uploadSensorToCs(sensorInfo: LocalSensorDefinition) {
         <TableHead>Sensor ID</TableHead>
         <TableHead>vPin</TableHead>
         <TableHead>Pull-Up</TableHead>
+        <TableHead>Status</TableHead>
         <TableHead>Actions</TableHead>
       </TableRow>
     </TableHeader>
@@ -54,6 +57,15 @@ function uploadSensorToCs(sensorInfo: LocalSensorDefinition) {
         <TableCell>{{ sensorInfo.id }}</TableCell>
         <TableCell>{{ sensorInfo.vPin }}</TableCell>
         <TableCell>{{ sensorInfo.pullUp }}</TableCell>
+        <TableCell>
+          {{
+            commandStationStatusStore.sensors[sensorInfo.id]
+              ? commandStationStatusStore.sensors[sensorInfo.id].value
+                ? 'Active'
+                : 'Inactive'
+              : '-'
+          }}
+        </TableCell>
         <TableCell class="flex gap-2">
           <Button @click="uploadSensorToCs(sensorInfo)" variant="outline" size="icon-sm">
             <UploadIcon />

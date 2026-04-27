@@ -1,5 +1,6 @@
+import type { SensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { readonly, ref } from 'vue';
 
 export type CommandStationInfo = {
   version: string;
@@ -10,11 +11,16 @@ export type CommandStationInfo = {
 
 export const useCommandStationStatusStore = defineStore('commandStationStatus', () => {
   const info = ref<CommandStationInfo | null>(null);
+  const sensors = ref<Record<string, SensorStatus>>({});
 
   return {
-    info,
+    info: readonly(info),
+    sensors: readonly(sensors),
     setInfo(newInfo: CommandStationInfo) {
       info.value = newInfo;
+    },
+    setSensorStatus(sensorStatus: SensorStatus) {
+      sensors.value[sensorStatus.id] = sensorStatus;
     },
   };
 });

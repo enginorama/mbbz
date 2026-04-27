@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCommandStation } from '@/commandstation/useCommandStation';
+import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Empty from '@/core/components/ui/empty/Empty.vue';
@@ -27,18 +28,21 @@ const cs = useCommandStation();
 
 const sensorInfos = ref(new Map<number, SensorInfo>());
 const localSensorStore = useLocalSensorStore();
+const commandStationStatusStore = useCommandStationStatusStore();
+const fetchingSensorValues = ref(false);
+const fetchingSensorList = ref(false);
 
 const sensorInfoList = computed(() =>
   Array.from(new Map(sensorInfos.value).values()).sort((a, b) => a.id - b.id),
 );
 
 async function fetchSensorList() {
+  fetchingSensorList.value = true;
   const sensors = await cs.getSensorList();
   const sensorInfoMap = new Map<number, SensorInfo>();
   sensors.forEach((sensor) => {
     sensorInfoMap.set(sensor.id, {
       id: sensor.id,
-      value: undefined,
       config: {
         vPin: sensor.vPin,
         pullUp: sensor.pullUp,
@@ -46,26 +50,13 @@ async function fetchSensorList() {
     });
   });
   sensorInfos.value = sensorInfoMap;
+  fetchingSensorList.value = false;
 }
 
 async function fetchSensorValues() {
-  const sensorValues = await cs.getSensorValues();
-  sensorValues.forEach((sensor) => {
-    setSensorValue(sensor.id, sensor.value);
-  });
-}
-
-function setSensorValue(sensorId: number, value: boolean) {
-  const sensorInfo = sensorInfos.value.get(sensorId);
-  if (sensorInfo) {
-    sensorInfo.value = value;
-  } else {
-    sensorInfos.value.set(sensorId, {
-      id: sensorId,
-      value: value,
-      config: {},
-    });
-  }
+  fetchingSensorValues.value = true;
+  await cs.getSensorValues();
+  fetchingSensorValues.value = false;
 }
 
 const dialog = useDialog();
@@ -93,8 +84,12 @@ onMounted(async () => {
   <PageLayout title="Sensors">
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex gap-4">
-        <Button @click="() => fetchSensorList()">Refresh Sensor List</Button>
-        <Button @click="() => fetchSensorValues()">Refresh Sensor Values</Button>
+        <Button @click="() => fetchSensorList()" :disabled="fetchingSensorList">
+          Refresh Sensor List
+        </Button>
+        <Button @click="() => fetchSensorValues()" :disabled="fetchingSensorValues">
+          Refresh Sensor Values
+        </Button>
       </div>
       <Button @click="addSensor">Add Sensor</Button>
     </Item>
@@ -118,7 +113,7 @@ onMounted(async () => {
             <TableCell>{{ sensorInfo.id }}</TableCell>
             <TableCell>{{ sensorInfo.config.vPin }}</TableCell>
             <TableCell>{{ sensorInfo.config.pullUp }}</TableCell>
-            <TableCell>{{ sensorInfo.value }}</TableCell>
+            <TableCell>{{ commandStationStatusStore.sensors[sensorInfo.id]?.value }}</TableCell>
           </TableRow>
         </TableBody>
         <TableBody v-else>
