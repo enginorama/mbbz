@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
-import { useConnection } from '@/connections/ExConnection';
-import { ExWebSerial } from '@/connections/transports/ExWebSerial';
+import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
+import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
 import PageLayout from '@/core/components/PageLayout.vue';
@@ -18,7 +18,7 @@ import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { useStorage } from '@vueuse/core';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
 
-const { connect, connected, connecting, disconnect } = useConnection();
+const { connect, connected, connecting, disconnect } = useWebSerialTransport();
 const isWebSerialSupported = ExWebSerial.isSupported;
 const commandStationStatusStore = useCommandStationStatusStore();
 const transportStatusStore = useTransportStatusStore();

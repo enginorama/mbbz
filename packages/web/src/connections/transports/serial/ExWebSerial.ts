@@ -30,12 +30,7 @@ export class ExWebSerial {
     this.onDataCallback = onData;
     this.onConnectionStatusChange = onConnectionStatusChange;
     if (ExWebSerial.isSupported) {
-      navigator.serial.addEventListener('disconnect', (e) => {
-        if (e.target === this.port) {
-          this.setConnected(false);
-          void this.close();
-        }
-      });
+      navigator.serial.addEventListener('disconnect', this.handleDisconnect);
     }
   }
 
@@ -53,7 +48,12 @@ export class ExWebSerial {
     await this.port.open({
       baudRate: 115200,
     });
-    await this.port.setSignals({ dataTerminalReady: false, requestToSend: false });
+    try {
+      await this.port.setSignals({ dataTerminalReady: false, requestToSend: false });
+    } catch (e) {
+      // Some implementations may not support setSignals; ignore failures
+      console.warn('setSignals not supported or failed:', e);
+    }
 
     const encoder = new TextEncoderStream();
     if (!this.port.writable) return false;
@@ -78,31 +78,59 @@ export class ExWebSerial {
 
   public async close() {
     if (this.reader) {
-      await this.reader.cancel();
-      await this.inputDone?.catch(() => {});
+      try {
+        await this.reader.cancel();
+        await this.inputDone?.catch(() => {});
+      } catch (e) {
+        console.warn('Error cancelling reader:', e);
+      }
       this.reader = null;
       this.inputDone = null;
     }
 
     if (this.outputStream) {
-      await this.outputStream.getWriter().close();
-      await this.outputDone;
+      try {
+        const writer = this.outputStream.getWriter();
+        await writer.close();
+        writer.releaseLock();
+        await this.outputDone;
+      } catch (e) {
+        console.warn('Error closing output stream:', e);
+      }
       this.outputStream = null;
       this.outputDone = null;
     }
 
-    await this.port?.close();
+    try {
+      await this.port?.close();
+    } catch (e) {
+      console.warn('Error closing port:', e);
+    }
     this.port = null;
+    if (ExWebSerial.isSupported) {
+      try {
+        navigator.serial.removeEventListener('disconnect', this.handleDisconnect);
+      } catch {
+        // ignore
+      }
+    }
     this.setConnected(false);
   }
 
   public async writeToStream(...lines: Array<string>) {
     const writer = this.outputStream?.getWriter();
     if (!writer) return;
-    for (const line of lines) {
-      await writer.write(`${line}` + '\n');
+    try {
+      for (const line of lines) {
+        await writer.write(`${line}` + '\n');
+      }
+    } catch (e) {
+      console.warn('Error writing to stream:', e);
+    } finally {
+      try {
+        writer.releaseLock();
+      } catch {}
     }
-    writer.releaseLock();
   }
 
   public async readLoop() {
@@ -112,7 +140,10 @@ export class ExWebSerial {
         this.onDataCallback(value);
       }
       if (done) {
-        this.reader.releaseLock();
+        try {
+          this.reader.releaseLock();
+        } catch {}
+        this.reader = null;
         break;
       }
     }
@@ -128,4 +159,11 @@ export class ExWebSerial {
     const status: WebSerialConnectionStatus = connected ? 'connected' : 'disconnected';
     this.onConnectionStatusChange(status);
   }
+
+  private handleDisconnect = (e: Event) => {
+    if (e?.target === this.port) {
+      this.setConnected(false);
+      void this.close();
+    }
+  };
 }

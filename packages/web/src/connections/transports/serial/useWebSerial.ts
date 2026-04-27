@@ -1,10 +1,6 @@
 import { ref } from 'vue';
 import { ExWebSerial } from './ExWebSerial';
 
-export type WebSerialConfig = {
-  port: SerialPort;
-};
-
 export function useWebSerial(callback: (msg: string) => void) {
   const connected = ref(false);
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useConnection } from '@/connections/ExConnection';
+import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
 import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import {
@@ -21,7 +21,7 @@ import { computed } from 'vue';
 
 const { isMobile } = useSidebar();
 
-const { connected, connect, disconnect, connecting } = useConnection();
+const { connected, connect, disconnect, connecting } = useWebSerialTransport();
 
 const { isConnected: websocketConnected, isConnecting: isWebSocketConnecting } =
   useWebSocketTransport();

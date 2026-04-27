@@ -1,13 +1,36 @@
 import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
-import { onUnmounted, provide, readonly, ref, watch } from 'vue';
+import {
+  inject,
+  onUnmounted,
+  provide,
+  readonly,
+  ref,
+  watch,
+  type InjectionKey,
+  type Ref,
+} from 'vue';
 import { toast } from 'vue-sonner';
-import { connectionInjectionKey } from '../ExConnection';
-import { useExStationInputBus, useExStationOutputBus } from '../ExEventBus';
-import { useConnectionLogger } from '../useConnectionLogger';
-import { useTransportStatusStore } from './useTransportStatusStore';
+import { useExStationInputBus, useExStationOutputBus } from '../../ExEventBus';
+import { useConnectionLogger } from '../../useConnectionLogger';
+import { useTransportStatusStore } from '../useTransportStatusStore';
 import { useWebSerial } from './useWebSerial';
 
-export function provideWebSerialConnection() {
+export const webserialTransportInjectionKey = Symbol('webserial-transport') as InjectionKey<{
+  connect: () => Promise<void>;
+  disconnect: () => void;
+  connected: Readonly<Ref<boolean>>;
+  connecting: Readonly<Ref<boolean>>;
+}>;
+
+export function useWebSerialTransport() {
+  const connection = inject(webserialTransportInjectionKey);
+  if (!connection) {
+    throw new Error('No connection provided');
+  }
+  return connection;
+}
+
+export function provideWebSerialTransport() {
   const inputBus = useExStationInputBus();
   const outputBus = useExStationOutputBus();
   const transportStatusStore = useTransportStatusStore();
@@ -66,7 +89,7 @@ export function provideWebSerialConnection() {
     }
   });
 
-  provide(connectionInjectionKey, {
+  provide(webserialTransportInjectionKey, {
     connect: tryToOpenConnection,
     connecting: readonly(connecting),
     disconnect: close,
