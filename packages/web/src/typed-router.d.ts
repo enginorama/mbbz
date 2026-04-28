@@ -36,6 +36,7 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       Record<never, never>,
       | '/(main)/'
+      | '/(main)/benchmark'
       | '/(main)/cabs/'
       | '/(main)/cvs'
       | '/(main)/exrail'
@@ -47,6 +48,13 @@ declare module 'vue-router/auto-routes' {
     '/(main)/': RouteRecordInfo<
       '/(main)/',
       '/',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/(main)/benchmark': RouteRecordInfo<
+      '/(main)/benchmark',
+      '/benchmark',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -100,13 +108,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/test': RouteRecordInfo<
-      '/test',
-      '/test',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
   }
 
   /**
@@ -124,6 +125,7 @@ declare module 'vue-router/auto-routes' {
       routes:
         | '/(main)'
         | '/(main)/'
+        | '/(main)/benchmark'
         | '/(main)/cabs/'
         | '/(main)/cvs'
         | '/(main)/exrail'
@@ -137,6 +139,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/(main)/index.vue': {
       routes:
         | '/(main)/'
+      views:
+        | never
+    }
+    'src/pages/(main)/benchmark.vue': {
+      routes:
+        | '/(main)/benchmark'
       views:
         | never
     }
@@ -179,12 +187,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/(main)/turnouts/index.vue': {
       routes:
         | '/(main)/turnouts/'
-      views:
-        | never
-    }
-    'src/pages/test.vue': {
-      routes:
-        | '/test'
       views:
         | never
     }
