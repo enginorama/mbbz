@@ -55,12 +55,12 @@ watch(vPinIsSensorId, (newValue) => {
 
 <template>
   <form class="w-100 rounded-2xl bg-white p-8" @submit.prevent="addSensor">
-    <h1 class="pb-6 text-xl font-semibold">Add Sensor</h1>
+    <h1 class="pb-6 text-xl font-semibold">{{ $t('components.addSensorDialog.addSensor') }}</h1>
     <FieldSet>
       <FieldGroup>
         <Field>
           <FieldContent>
-            <FieldLabel for="vPin"> VPin </FieldLabel>
+            <FieldLabel for="vPin"> {{ $t('components.addSensorDialog.vPin') }} </FieldLabel>
           </FieldContent>
           <NumberField id="vPin" v-model="vPin" :min="0">
             <NumberFieldContent>
@@ -74,20 +74,26 @@ watch(vPinIsSensorId, (newValue) => {
     </FieldSet>
     <Accordion collapsible class="mt-2 w-full">
       <AccordionItem value="advanced-options">
-        <AccordionTrigger class="mb-2">Advanced options</AccordionTrigger>
+        <AccordionTrigger class="mb-2">{{
+          $t('components.addSensorDialog.advancedOptions')
+        }}</AccordionTrigger>
         <AccordionContent class="mb-2">
           <FieldSet>
             <FieldGroup>
               <Field orientation="horizontal">
                 <FieldContent>
-                  <FieldLabel for="vPinIsSensorId">Use vPin number as Sensor ID </FieldLabel>
+                  <FieldLabel for="vPinIsSensorId">{{
+                    $t('components.addSensorDialog.useVPinAsSensorId')
+                  }}</FieldLabel>
                   <FieldDescription></FieldDescription>
                 </FieldContent>
                 <Switch id="vPinIsSensorId" v-model="vPinIsSensorId" />
               </Field>
               <Field v-if="!vPinIsSensorId" class="-mt-4">
                 <FieldContent>
-                  <FieldLabel for="sensorId"> Sensor ID </FieldLabel>
+                  <FieldLabel for="sensorId">{{
+                    $t('components.addSensorDialog.sensorId')
+                  }}</FieldLabel>
                 </FieldContent>
                 <NumberField id="sensorId" v-model="sensorId" :min="0" :focus-on-change="false">
                   <NumberFieldContent>
@@ -99,11 +105,11 @@ watch(vPinIsSensorId, (newValue) => {
               </Field>
               <Field>
                 <FieldContent>
-                  <Label for="pullUp"> Pull-up </Label>
+                  <Label for="pullUp">{{ $t('components.addSensorDialog.pullUp') }}</Label>
                 </FieldContent>
                 <NativeSelect id="pullUp" v-model="pullUp">
-                  <NativeSelectOption :value="'1'">Yes</NativeSelectOption>
-                  <NativeSelectOption :value="'0'">No</NativeSelectOption>
+                  <NativeSelectOption :value="'1'">{{ $t('global.yes') }}</NativeSelectOption>
+                  <NativeSelectOption :value="'0'">{{ $t('global.no') }}</NativeSelectOption>
                 </NativeSelect>
               </Field>
             </FieldGroup>
@@ -112,8 +118,12 @@ watch(vPinIsSensorId, (newValue) => {
       </AccordionItem>
     </Accordion>
     <Field orientation="horizontal">
-      <Button type="submit"> Submit </Button>
-      <Button variant="outline" type="button" @click="emit('close', undefined)"> Cancel </Button>
+      <Button type="submit">
+        {{ $t('globals.formActions.submit') }}
+      </Button>
+      <Button variant="outline" type="button" @click="emit('close', undefined)">{{
+        $t('globals.formActions.cancel')
+      }}</Button>
     </Field>
   </form>
 </template>

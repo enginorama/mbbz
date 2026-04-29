@@ -21,7 +21,7 @@ import AddSensorDialog from '@/sensors/AddSensorDialog.vue';
 import LocalSensorList from '@/sensors/LocalSensorList.vue';
 import type { SensorInfo } from '@/sensors/SensorInfo';
 import { useLocalSensorStore } from '@/sensors/useLocalSensorStore';
-import { FolderCode } from 'lucide-vue-next';
+import { FolderCode, PlusIcon } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 const cs = useCommandStation();
@@ -81,17 +81,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <PageLayout title="Sensors">
+  <PageLayout :title="$t('pages.sensors.title')">
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex gap-4">
         <Button @click="() => fetchSensorList()" :disabled="fetchingSensorList">
-          Refresh Sensor List
+          {{ $t('pages.sensors.refreshList') }}
         </Button>
         <Button @click="() => fetchSensorValues()" :disabled="fetchingSensorValues">
-          Refresh Sensor Values
+          {{ $t('pages.sensors.refreshValues') }}
         </Button>
       </div>
-      <Button @click="addSensor">Add Sensor</Button>
+      <Button @click="addSensor"><PlusIcon /> {{ $t('pages.sensors.addSensor') }}</Button>
     </Item>
     <div>
       <h2 class="mb-2 text-lg font-semibold">Local Sensors</h2>

@@ -1,4 +1,14 @@
 {
+  "components": {
+    "addSensorDialog": {
+      "addSensor": "Add Sensor",
+      "advancedOptions": "Advanced options",
+      "pullUp": "Pull-up",
+      "sensorId": "Sensor ID",
+      "useVPinAsSensorId": "Use vPin number as Sensor ID",
+      "vPin": "VPin"
+    }
+  },
   "cvs": {
     "cvTable": {
       "title": "CV Table"
@@ -17,6 +27,10 @@
       "9": "Total PWM Period"
     }
   },
+  "global": {
+    "no": "No",
+    "yes": "Yes"
+  },
   "globals": {
     "actions": "Actions",
     "add": "Add",
@@ -27,6 +41,10 @@
     "disconnect": "Disconnect",
     "fileFormats": {
       "csv": "CSV"
+    },
+    "formActions": {
+      "cancel": "Cancel",
+      "submit": "Submit"
     },
     "numberFormat": {
       "binary": "Binary",
@@ -40,6 +58,12 @@
     "cvs": {
       "addCv": "Add CV",
       "refreshAll": "Refresh all"
+    },
+    "sensors": {
+      "addSensor": "Add Sensor",
+      "refreshList": "Refresh Sensor List",
+      "refreshValues": "Refresh Sensor Values",
+      "title": "Sensors"
     }
   },
   "sidebar": {
