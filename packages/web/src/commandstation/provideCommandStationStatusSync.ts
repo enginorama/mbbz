@@ -1,4 +1,5 @@
 import { useExNativeInputBus } from '@/connections/ExEventBus';
+import { parseCommandStationInfo } from '@/ex-native/parsers/parseCommandStationInfo';
 import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { parseTrackConfiguration } from '@/ex-native/parsers/parseTrackConfiguration';
 import { parseTrackPower } from '@/ex-native/parsers/parseTrackPower';
@@ -9,13 +10,9 @@ export function provideCommandStationStatusSync() {
   const commandStationStatusStore = useCommandStationStatusStore();
 
   exNativeInputBus.on((command) => {
-    if (command.command === 'iDCC-EX') {
-      commandStationStatusStore.setInfo({
-        version: command.params[0] ?? '',
-        boardType: command.params[2] ?? '',
-        motorShield: command.params[4] ?? '',
-        buildNumber: command.params[5] ?? '',
-      });
+    const commandStationInfo = parseCommandStationInfo(command);
+    if (commandStationInfo) {
+      commandStationStatusStore.setInfo(commandStationInfo);
       return;
     }
 

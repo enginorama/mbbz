@@ -1,15 +1,9 @@
+import type { CommandStationInfo } from '@/ex-native/parsers/parseCommandStationInfo';
 import type { SensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import type { TrackConfiguration } from '@/ex-native/parsers/parseTrackConfiguration';
 import type { TrackPower } from '@/ex-native/parsers/parseTrackPower';
 import { defineStore } from 'pinia';
 import { readonly, ref } from 'vue';
-
-export type CommandStationInfo = {
-  version: string;
-  boardType: string;
-  motorShield: string;
-  buildNumber: string;
-};
 
 export const useCommandStationStatusStore = defineStore('commandStationStatus', () => {
   const info = ref<CommandStationInfo | null>(null);
