@@ -1,5 +1,7 @@
 import { useExNativeInputBus } from '@/connections/ExEventBus';
 import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
+import { parseTrackConfiguration } from '@/ex-native/parsers/parseTrackConfiguration';
+import { parseTrackPower } from '@/ex-native/parsers/parseTrackPower';
 import { useCommandStationStatusStore } from './useCommandStationStatusStore';
 
 export function provideCommandStationStatusSync() {
@@ -20,6 +22,18 @@ export function provideCommandStationStatusSync() {
     const sensorStatus = parseSensorStatus(command);
     if (sensorStatus) {
       commandStationStatusStore.setSensorStatus(sensorStatus);
+      return;
+    }
+
+    const trackConfiguration = parseTrackConfiguration(command);
+    if (trackConfiguration) {
+      commandStationStatusStore.setTrackConfiguration(trackConfiguration);
+      return;
+    }
+
+    const trackPower = parseTrackPower(command);
+    if (trackPower) {
+      commandStationStatusStore.setTrackPower(trackPower);
       return;
     }
   });

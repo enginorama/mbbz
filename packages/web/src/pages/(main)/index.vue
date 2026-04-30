@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
+import { useExStationOutputBus } from '@/connections/ExEventBus';
 import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
 import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
@@ -15,15 +16,36 @@ import Item from '@/core/components/ui/item/Item.vue';
 import ItemContent from '@/core/components/ui/item/ItemContent.vue';
 import ItemTitle from '@/core/components/ui/item/ItemTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
+import type { TrackMode } from '@/ex-native/parsers/parseTrackConfiguration';
 import { useStorage } from '@vueuse/core';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 const { connect, connected, connecting, disconnect } = useWebSerialTransport();
 const isWebSerialSupported = ExWebSerial.isSupported;
 const commandStationStatusStore = useCommandStationStatusStore();
 const transportStatusStore = useTransportStatusStore();
+const outputBus = useExStationOutputBus();
 
 const websocketAddress = useStorage('websocketAddress', 'ws://dccex.local:2560');
+
+const powerInfo = computed<Array<{ track: string; mode?: TrackMode; on?: boolean }>>(() => {
+  const trackNames = [
+    ...new Set([
+      ...Object.keys(commandStationStatusStore.trackPowers),
+      ...Object.keys(commandStationStatusStore.trackConfigurations),
+    ]).values(),
+  ].sort();
+  return trackNames.map((track) => {
+    const power = commandStationStatusStore.trackPowers[track];
+    const config = commandStationStatusStore.trackConfigurations[track];
+    return {
+      track,
+      mode: config?.mode,
+      on: power?.on,
+    };
+  });
+});
 
 const {
   connect: connectWebSocket,
@@ -35,6 +57,13 @@ const {
 const connectWebSocketHandler = () => {
   connectWebSocket(websocketAddress.value);
 };
+
+function togglePower(track: string): void {
+  const currentPower = commandStationStatusStore.trackPowers[track];
+  const newPowerState = !(currentPower?.on ?? false);
+  const command = newPowerState ? `1 ${track}` : `0 ${track}`;
+  outputBus.emit(`<${command}>`);
+}
 </script>
 
 <template>
@@ -129,12 +158,22 @@ const connectWebSocketHandler = () => {
           </ul>
           <ul>
             <li v-if="commandStationStatusStore.info">
-              <div>Version: {{ commandStationStatusStore.info.version }}</div>
+              <div class="font-bold">Version: {{ commandStationStatusStore.info.version }}</div>
               <div>Board Type: {{ commandStationStatusStore.info.boardType }}</div>
               <div>Motor Shield: {{ commandStationStatusStore.info.motorShield }}</div>
               <div>Build Number: {{ commandStationStatusStore.info.buildNumber }}</div>
             </li>
             <li v-else class="text-gray-500">No command station info available.</li>
+          </ul>
+          <ul class="mt-4 flex gap-8">
+            <li v-for="power in powerInfo" :key="power.track">
+              <div class="font-bold">Track: {{ power.track }}</div>
+              <div>Mode: {{ power.mode ?? 'unknown' }}</div>
+              <div>Power: {{ power.on === undefined ? 'unknown' : power.on ? 'on' : 'off' }}</div>
+              <Button variant="outline" class="mt-2" @click="togglePower(power.track)">
+                Toggle
+              </Button>
+            </li>
           </ul>
         </CardContent>
       </Card>
