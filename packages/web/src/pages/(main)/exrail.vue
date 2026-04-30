@@ -2,7 +2,7 @@
 import { useExNativeInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
-import { BugIcon, MessageCircleQuestionIcon, PauseIcon, PlayIcon } from 'lucide-vue-next';
+import { MessageCircleQuestionIcon, PauseIcon, PlayIcon } from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
 
 const { emit } = useExStationOutputBus();
@@ -35,21 +35,16 @@ function resume(): void {
 function requestStatus(): void {
   emit('</>');
 }
-
-function enableDiagnosticMode(): void {
-  emit('</D EXRAIL ON>');
-}
 </script>
 
 <template>
   <PageLayout title="EXRAIL" subtitle="Automations on your layout">
-    <div class="flex gap-4">
+    <div class="flex flex-wrap gap-4">
       <Button @click="pause"><PauseIcon></PauseIcon>Pause</Button>
       <Button @click="resume"><PlayIcon></PlayIcon>Resume</Button>
       <Button @click="requestStatus">
         <MessageCircleQuestionIcon></MessageCircleQuestionIcon> Status
       </Button>
-      <Button @click="enableDiagnosticMode"><BugIcon></BugIcon>Enable Diagnostics</Button>
     </div>
     <div class="mt-4 h-64 overflow-y-auto rounded bg-gray-100 p-4">
       <ul>
