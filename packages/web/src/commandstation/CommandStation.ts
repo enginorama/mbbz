@@ -166,6 +166,18 @@ export class CommandStation {
     });
   }
 
+  public requestMaxAllowedCurrent(): Promise<void> {
+    return this.queue.add(async () => {
+      this.sendCommand('<JG>');
+    });
+  }
+
+  public requestCurrentsList(): Promise<void> {
+    return this.queue.add(async () => {
+      this.sendCommand('<JI>');
+    });
+  }
+
   public addSensor(sensorId: number, vPin: number, pullUp: boolean) {
     void this.queue.add(async () => {
       this.sendCommand(`<S ${sensorId} ${vPin} ${pullUp ? '1' : '0'}>`);

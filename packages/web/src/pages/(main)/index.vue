@@ -64,6 +64,14 @@ function togglePower(track: string): void {
   const command = newPowerState ? `1 ${track}` : `0 ${track}`;
   outputBus.emit(`<${command}>`);
 }
+
+function emergencyStop(): void {
+  outputBus.emit('<!>');
+}
+
+function resume(): void {
+  outputBus.emit('<!R>');
+}
 </script>
 
 <template>
@@ -162,6 +170,9 @@ function togglePower(track: string): void {
               <div>Board Type: {{ commandStationStatusStore.info.boardType }}</div>
               <div>Motor Shield: {{ commandStationStatusStore.info.motorShield }}</div>
               <div>Build Number: {{ commandStationStatusStore.info.buildNumber }}</div>
+              <div v-if="commandStationStatusStore.numMaxSupportedCabs !== null">
+                Max Supported Cabs: {{ commandStationStatusStore.numMaxSupportedCabs }}
+              </div>
             </li>
             <li v-else class="text-gray-500">No command station info available.</li>
           </ul>
@@ -175,6 +186,10 @@ function togglePower(track: string): void {
               </Button>
             </li>
           </ul>
+          <div v-if="transportStatusStore.isConnected" class="mt-4 flex gap-2">
+            <Button @click="emergencyStop">E-Stop</Button>
+            <Button @click="resume">Resume</Button>
+          </div>
         </CardContent>
       </Card>
     </div>

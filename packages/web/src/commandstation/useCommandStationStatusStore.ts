@@ -12,11 +12,14 @@ export const useCommandStationStatusStore = defineStore('commandStationStatus', 
   const trackConfigurations = ref<Record<string, TrackConfiguration>>({});
   const trackPowers = ref<Record<string, TrackPower>>({});
 
+  const numMaxSupportedCabs = ref<number | null>(null);
+
   return {
     info: readonly(info),
     sensors: readonly(sensors),
     trackConfigurations: readonly(trackConfigurations),
     trackPowers: readonly(trackPowers),
+    numMaxSupportedCabs: readonly(numMaxSupportedCabs),
     setInfo(newInfo: CommandStationInfo) {
       info.value = newInfo;
     },
@@ -28,6 +31,9 @@ export const useCommandStationStatusStore = defineStore('commandStationStatus', 
     },
     setTrackPower(trackPower: TrackPower) {
       trackPowers.value[trackPower.track] = trackPower;
+    },
+    setNumMaxSupportedCabs(num: number | null) {
+      numMaxSupportedCabs.value = num;
     },
   };
 });
