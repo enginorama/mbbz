@@ -16,5 +16,5 @@ export const parseCommandStationInfo: CommandParser<CommandStationInfo> = ({ com
       buildNumber: params[5] ?? '',
     };
   }
-  return null;
+  return undefined;
 };

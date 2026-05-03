@@ -12,5 +12,5 @@ export const parseTrackPower: CommandParser<TrackPower> = ({ command, params }) 
       on: command === 'p1',
     };
   }
-  return null;
+  return undefined;
 };

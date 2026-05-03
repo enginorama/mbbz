@@ -12,5 +12,5 @@ export const parseSensorStatus: CommandParser<SensorStatus> = ({ command, params
       value: command === 'Q',
     };
   }
-  return null;
+  return undefined;
 };

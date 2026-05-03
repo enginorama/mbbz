@@ -6,13 +6,15 @@ import { defineStore } from 'pinia';
 import { readonly, ref } from 'vue';
 
 export const useCommandStationStatusStore = defineStore('commandStationStatus', () => {
-  const info = ref<CommandStationInfo | null>(null);
+  const info = ref<CommandStationInfo | undefined>();
   const sensors = ref<Record<string, SensorStatus>>({});
 
   const trackConfigurations = ref<Record<string, TrackConfiguration>>({});
   const trackPowers = ref<Record<string, TrackPower>>({});
 
-  const numMaxSupportedCabs = ref<number | null>(null);
+  const numMaxSupportedCabs = ref<number | undefined>();
+
+  const isPaused = ref<boolean | undefined>();
 
   return {
     info: readonly(info),
@@ -20,7 +22,8 @@ export const useCommandStationStatusStore = defineStore('commandStationStatus', 
     trackConfigurations: readonly(trackConfigurations),
     trackPowers: readonly(trackPowers),
     numMaxSupportedCabs: readonly(numMaxSupportedCabs),
-    setInfo(newInfo: CommandStationInfo) {
+    isPaused: readonly(isPaused),
+    setInfo(newInfo: CommandStationInfo | undefined) {
       info.value = newInfo;
     },
     setSensorStatus(sensorStatus: SensorStatus) {
@@ -32,8 +35,11 @@ export const useCommandStationStatusStore = defineStore('commandStationStatus', 
     setTrackPower(trackPower: TrackPower) {
       trackPowers.value[trackPower.track] = trackPower;
     },
-    setNumMaxSupportedCabs(num: number | null) {
+    setNumMaxSupportedCabs(num: number | undefined) {
       numMaxSupportedCabs.value = num;
+    },
+    setIsPaused(paused: boolean | undefined) {
+      isPaused.value = paused;
     },
   };
 });

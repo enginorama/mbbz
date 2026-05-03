@@ -7,5 +7,5 @@ export const parseNumMaxSupportedCabs: CommandParser<number> = ({ command, param
       return num;
     }
   }
-  return null;
+  return undefined;
 };

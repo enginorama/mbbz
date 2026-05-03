@@ -38,5 +38,5 @@ export const parseTrackConfiguration: CommandParser<TrackConfiguration> = ({ com
       mode: parseTrackMode(params[1]),
     };
   }
-  return null;
+  return undefined;
 };

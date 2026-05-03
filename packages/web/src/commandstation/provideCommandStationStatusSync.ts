@@ -1,6 +1,7 @@
 import { useExNativeInputBus } from '@/connections/ExEventBus';
 import { parseCommandStationInfo } from '@/ex-native/parsers/parseCommandStationInfo';
 import { parseNumMaxSupportedCabs } from '@/ex-native/parsers/parseNumMaxSupportedCabs';
+import { parsePauseStatus } from '@/ex-native/parsers/parsePauseStatus';
 import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { parseTrackConfiguration } from '@/ex-native/parsers/parseTrackConfiguration';
 import { parseTrackPower } from '@/ex-native/parsers/parseTrackPower';
@@ -36,8 +37,14 @@ export function provideCommandStationStatusSync() {
     }
 
     const numMaxSupportedCabs = parseNumMaxSupportedCabs(command);
-    if (numMaxSupportedCabs !== null) {
-      commandStationStatusStore.setNumMaxSupportedCabs(numMaxSupportedCabs ?? null);
+    if (numMaxSupportedCabs !== undefined) {
+      commandStationStatusStore.setNumMaxSupportedCabs(numMaxSupportedCabs);
+      return;
+    }
+
+    const isPaused = parsePauseStatus(command);
+    if (isPaused !== undefined) {
+      commandStationStatusStore.setIsPaused(isPaused);
       return;
     }
   });

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useCommandStation } from '@/commandstation/useCommandStation';
 import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
 import { useExStationOutputBus } from '@/connections/ExEventBus';
 import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
@@ -26,6 +27,7 @@ const isWebSerialSupported = ExWebSerial.isSupported;
 const commandStationStatusStore = useCommandStationStatusStore();
 const transportStatusStore = useTransportStatusStore();
 const outputBus = useExStationOutputBus();
+const commandStation = useCommandStation();
 
 const websocketAddress = useStorage('websocketAddress', 'ws://dccex.local:2560');
 
@@ -66,11 +68,15 @@ function togglePower(track: string): void {
 }
 
 function emergencyStop(): void {
-  outputBus.emit('<!>');
+  commandStation.sendEmergencyStop();
+}
+
+function pause(): void {
+  commandStation.sendPauseCabs();
 }
 
 function resume(): void {
-  outputBus.emit('<!R>');
+  commandStation.sendResumeCabs();
 }
 </script>
 
@@ -170,7 +176,7 @@ function resume(): void {
               <div>Board Type: {{ commandStationStatusStore.info.boardType }}</div>
               <div>Motor Shield: {{ commandStationStatusStore.info.motorShield }}</div>
               <div>Build Number: {{ commandStationStatusStore.info.buildNumber }}</div>
-              <div v-if="commandStationStatusStore.numMaxSupportedCabs !== null">
+              <div v-if="commandStationStatusStore.numMaxSupportedCabs != null">
                 Max Supported Cabs: {{ commandStationStatusStore.numMaxSupportedCabs }}
               </div>
             </li>
@@ -186,9 +192,23 @@ function resume(): void {
               </Button>
             </li>
           </ul>
-          <div v-if="transportStatusStore.isConnected" class="mt-4 flex gap-2">
-            <Button @click="emergencyStop">E-Stop</Button>
-            <Button @click="resume">Resume</Button>
+          <div v-if="transportStatusStore.isConnected" class="mt-4 flex flex-col items-start gap-2">
+            <div>
+              <Button @click="emergencyStop">E-Stop</Button>
+            </div>
+            <div class="flex items-center gap-2" v-if="commandStationStatusStore.isPaused != null">
+              <Button @click="pause" :disabled="commandStationStatusStore.isPaused === true">
+                Pause
+              </Button>
+              <Button @click="resume" :disabled="commandStationStatusStore.isPaused === false">
+                Resume
+              </Button>
+            </div>
+            <div v-else>
+              <Button @click="() => commandStation.requestPauseStatus()">
+                Request Pause Status
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

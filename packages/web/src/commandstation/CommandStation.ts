@@ -41,7 +41,7 @@ export class CommandStation {
     const rosterAddresses = await this.getRosterAddresses();
     for (const address of rosterAddresses) {
       const entry = await this.getRosterEntry(address);
-      if (entry !== null) {
+      if (entry != null) {
         entries.push(entry);
       }
     }
@@ -82,7 +82,7 @@ export class CommandStation {
     const turnoutIds = await this.getTurnoutIds();
     for (const id of turnoutIds) {
       const entry = await this.getTurnoutEntry(id);
-      if (entry !== null) {
+      if (entry != null) {
         entries.push(entry);
       }
     }
@@ -187,6 +187,26 @@ export class CommandStation {
   public setOutputPin(pin: number, value: boolean) {
     void this.queue.add(async () => {
       this.sendCommand(`<z ${value ? '' : '-'}${pin}>`);
+    });
+  }
+
+  public sendEmergencyStop() {
+    this.sendCommand('<!>');
+  }
+
+  public sendPauseCabs() {
+    this.sendCommand('<!P>');
+  }
+
+  public sendResumeCabs() {
+    return this.queue.add(async () => {
+      this.sendCommand('<!R>');
+    });
+  }
+
+  public requestPauseStatus(): Promise<void> {
+    return this.queue.add(async () => {
+      this.sendCommand('<!Q>');
     });
   }
 
