@@ -31,6 +31,7 @@ interface NavItem {
   label: string;
   icon: FunctionalComponent;
   to: RouteLocationRaw;
+  exact?: boolean;
 }
 
 const { setOpenMobile } = useSidebar();
@@ -45,6 +46,7 @@ const navItems = computed<NavItem[]>(() => {
       label: 'sidebar.start',
       icon: HomeIcon,
       to: { name: '/(main)/' },
+      exact: true,
     },
     {
       label: 'sidebar.throttle',
@@ -109,6 +111,8 @@ const navItems = computed<NavItem[]>(() => {
                   :to="navItem.to"
                   @click="closeIfMobile"
                   class="flex items-center gap-3 rounded-lg px-3 py-2"
+                  :active-class="!navItem.exact ? 'text-blue-600' : ''"
+                  :exact-active-class="navItem.exact ? 'text-blue-600' : ''"
                 >
                   <div class="flex aspect-square size-8 items-center justify-center">
                     <component :is="navItem.icon" />
@@ -129,6 +133,7 @@ const navItems = computed<NavItem[]>(() => {
               :to="{ name: '/(main)/logs' }"
               @click="closeIfMobile"
               class="flex items-center gap-3 rounded-lg px-3 py-2"
+              active-class="text-blue-600"
             >
               <div class="flex aspect-square size-8 items-center justify-center">
                 <LogsIcon />

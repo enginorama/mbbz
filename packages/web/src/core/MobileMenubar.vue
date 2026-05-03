@@ -14,6 +14,7 @@ const navItems = computed<
     label: string;
     icon: Component;
     to: RouteLocationRaw;
+    exact?: boolean;
   }>
 >(() => {
   return [
@@ -21,6 +22,7 @@ const navItems = computed<
       label: 'sidebar.start',
       icon: HomeIcon,
       to: { name: '/(main)/' },
+      exact: true,
     },
     {
       label: 'sidebar.throttle',
@@ -53,6 +55,8 @@ const navItems = computed<
       :key="navItem.label"
       :to="navItem.to"
       class="flex items-center gap-3 rounded-lg px-3 py-2"
+      :active-class="!navItem.exact ? 'text-blue-600' : ''"
+      :exact-active-class="navItem.exact ? 'text-blue-600' : ''"
       :aria-label="$t(navItem.label)"
     >
       <component :is="navItem.icon" :alt="$t(navItem.label)" />
