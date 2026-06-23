@@ -1,8 +1,8 @@
 {
   "folders": [
     {
-      "path": "./packages/web",
-    },
+      "path": "."
+    }
   ],
   "settings": {
     "remote.portsAttributes": {
@@ -14,25 +14,39 @@
       },
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "tailwindCSS.classFunctions": ["cva", "cx"],
+    "tailwindCSS.classFunctions": [
+      "cva",
+      "cx"
+    ],
     "files.associations": {
       "*.css": "tailwindcss",
     },
     "scss.lint.unknownAtRules": "ignore",
     "css.lint.unknownAtRules": "ignore",
     "editor.formatOnSave": true,
-    "i18n-ally.localesPaths": ["src/locales"],
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit",
+    },
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "tsconfig.json": "tsconfig.*.json, env.d.ts",
+      "vite.config.*": "jsconfig*, vitest.config.*, cypress.config.*, playwright.config.*",
+      "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .oxlint*, oxlint*, .prettier*, prettier*, .editorconfig, oxfmt*"
+    },
+    "i18n-ally.localesPaths": [
+      "src/locales"
+    ],
     "i18n-ally.pathMatcher": "{locale}.{ext}",
-    "i18n-ally.enabledFrameworks": ["vue"],
+    "i18n-ally.enabledFrameworks": [
+      "vue"
+    ],
     "i18n-ally.extract.keyMaxLength": 200,
     "i18n-ally.sortCompare": "locale",
     "i18n-ally.sortKeys": true,
     "i18n-ally.sortLocale": "en",
     "i18n-ally.sourceLanguage": "en",
     "i18n-ally.displayLanguage": "en",
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit",
-    },
     "i18n-ally.keystyle": "nested",
     "i18n-ally.extract.autoDetect": true,
   },
