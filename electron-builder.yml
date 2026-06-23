@@ -1,0 +1,13 @@
+appId: at.croku.mbbz
+productName: mbbz
+directories:
+  buildResources: build
+  output: release
+files:
+  - out/**
+win:
+  target: nsis
+mac:
+  target: dmg
+linux:
+  target: AppImage

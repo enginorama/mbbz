@@ -13,9 +13,10 @@ import { createI18n } from 'vue-i18n';
 import App from './App.vue';
 
 const router = createRouter({
-  history: import.meta.env.VITE_GITHUB_PAGES
-    ? createWebHashHistory(import.meta.env.BASE_URL)
-    : createWebHistory(import.meta.env.BASE_URL),
+  history:
+    import.meta.env.VITE_GITHUB_PAGES || import.meta.env.VITE_ELECTRON
+      ? createWebHashHistory(import.meta.env.BASE_URL)
+      : createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 

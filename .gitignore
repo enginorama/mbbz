@@ -14,6 +14,8 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+out
+release
 coverage
 *.local
 

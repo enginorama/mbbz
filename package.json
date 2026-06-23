@@ -6,6 +6,7 @@
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
+  "main": "out/main/main.js",
   "scripts": {
     "dev": "vite --host",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -17,7 +18,11 @@
     "lint:eslint": "eslint .",
     "lint": "run-s lint:*",
     "format": "oxfmt src/",
-    "format:check": "oxfmt src/ --check"
+    "format:check": "oxfmt src/ --check",
+    "electron:dev": "electron-vite dev -- --no-sandbox",
+    "electron:build": "electron-vite build",
+    "electron:preview": "electron-vite preview",
+    "electron:package": "electron-vite build && electron-builder"
   },
   "dependencies": {
     "@intlify/unplugin-vue-i18n": "^11.2.4",
@@ -50,6 +55,9 @@
     "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/test-utils": "^2.4.11",
     "@vue/tsconfig": "^0.9.1",
+    "electron": "^42.5.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^6.0.0-beta.1",
     "eslint": "^10.5.0",
     "eslint-plugin-oxlint": "^1.71.0",
     "eslint-plugin-vue": "~10.9.2",

@@ -1,0 +1,22 @@
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
+import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from 'node:url';
+import type { UserConfig } from 'vite';
+import vueDevTools from 'vite-plugin-vue-devtools';
+import VueRouter from 'vue-router/vite';
+
+export const sharedConfig: UserConfig = {
+  plugins: [
+    VueRouter({ dts: 'src/typed-router.d.ts', exclude: ['**/components/**'] }),
+    vue(),
+    tailwindcss(),
+    vueDevTools(),
+    VueI18nPlugin({ include: ['./src/locales/**'] }),
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+};
