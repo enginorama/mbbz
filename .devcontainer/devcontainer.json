@@ -2,7 +2,9 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
 	"name": "mbbz",
-	"runArgs": ["--shm-size=512m"],
+	"runArgs": [
+		"--shm-size=512m"
+	],
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:24",
 	"customizations": {
@@ -18,13 +20,13 @@
 				"Lokalise.i18n-ally"
 			]
 		}
-	}
+	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y libgtk-3-0 libgbm1 libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxrandr2 libxfixes3 libxext6 libx11-xcb1 libxss1 libxtst6 libasound2 libpango-1.0-0 libgdk-pixbuf-xlib-2.0-0 libgl1 && npm install && sudo chown root:root node_modules/electron/dist/chrome-sandbox && sudo chmod 4755 node_modules/electron/dist/chrome-sandbox",
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y libgtk-3-0 libgbm1 libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxrandr2 libxfixes3 libxext6 libx11-xcb1 libxss1 libxtst6 libasound2 libpango-1.0-0 libgdk-pixbuf-xlib-2.0-0 libgl1 && npm install && sudo chown root:root node_modules/electron/dist/chrome-sandbox && sudo chmod 4755 node_modules/electron/dist/chrome-sandbox"
 	// Configure tool-specific properties.
 	// "customizations": {},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
