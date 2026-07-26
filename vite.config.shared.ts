@@ -19,4 +19,9 @@ export const sharedConfig: UserConfig = {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    watch: {
+      ignored: ['**/src-tauri/**'],
+    },
+  },
 };
