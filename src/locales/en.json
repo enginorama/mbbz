@@ -67,6 +67,7 @@
     }
   },
   "sidebar": {
+    "benchmark": "Benchmark",
     "cabs": "Cabs",
     "cvs": "CV Analyser",
     "exrail": "EXRAIL",

@@ -213,7 +213,7 @@ export class CommandStation {
   /**
    * Sends a command and waits until the callback returns a non-undefined value or the timeout is reached.
    */
-  private async sendAndWaitForResponse<T>({
+  public async sendAndWaitForResponse<T>({
     command,
     callback,
     defaultValue,

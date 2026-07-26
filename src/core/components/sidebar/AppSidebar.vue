@@ -17,6 +17,7 @@ import {
   Repeat1Icon,
   ServerCogIcon,
   SplitIcon,
+  TimerIcon,
   TrainFrontIcon,
 } from '@lucide/vue';
 import { computed, markRaw, type FunctionalComponent } from 'vue';
@@ -77,6 +78,11 @@ const navItems = computed<NavItem[]>(() => {
       label: 'sidebar.cvs',
       icon: ServerCogIcon,
       to: { name: '/(main)/cvs' },
+    },
+    {
+      label: 'sidebar.benchmark',
+      icon: TimerIcon,
+      to: { name: '/(main)/benchmark' },
     },
   ];
 });

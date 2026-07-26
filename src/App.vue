@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router';
 import { setupCabStateSync } from './cabs/state/setupCabStateSync';
 import { provideCommandStationStatusSync } from './commandstation/provideCommandStationStatusSync';
 import { setupDccInputBus } from './connections/ExConnection';
+import { provideTauriSerialTransport } from './connections/transports/serial/provideTauriSerialTransport';
 import { provideWebSerialTransport } from './connections/transports/serial/provideWebSerialTransport';
 import { provideWebSocketTransport } from './connections/transports/websocket/useWebSocketTransport';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
@@ -19,7 +20,7 @@ const isAnyDialogOpen = ref(false);
 const dialogContainer = useTemplateRef('dialogContainer');
 provideDialog(dialogContainer);
 provideWebSerialTransport();
-
+provideTauriSerialTransport();
 provideWebSocketTransport();
 </script>
 
