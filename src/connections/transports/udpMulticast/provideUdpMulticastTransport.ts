@@ -8,7 +8,7 @@ import { useUdpMulticast } from './useUdpMulticast';
 
 export const udpMulticastTransportInjectionKey = Symbol('udp-multicast-transport') as InjectionKey<{
   connect: (group: string, deviceAddress: string, port: number) => Promise<void>;
-  disconnect: () => void;
+  disconnect: () => Promise<void>;
   connected: Readonly<Ref<boolean>>;
   connecting: Readonly<Ref<boolean>>;
   isSupported: boolean;
