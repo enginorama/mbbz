@@ -1,10 +1,15 @@
+mod mdns;
+mod udp_multicast;
+
 use std::io::{Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use mdns::MdnsState;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Emitter, State};
+use udp_multicast::UdpMulticastState;
 
 const SERIAL_DISCONNECTED_EVENT: &str = "serial://disconnected";
 
@@ -260,17 +265,25 @@ struct UsbPortInfo {
 pub fn run() {
   tauri::Builder::default()
     .manage(SerialState::default())
+    .manage(MdnsState::default())
+    .manage(UdpMulticastState::default())
     .invoke_handler(tauri::generate_handler![
       list_serial_ports,
       open_serial_port,
       close_serial_port,
-      write_serial_port
+      write_serial_port,
+      mdns::start_mdns_scan,
+      mdns::stop_mdns_scan,
+      udp_multicast::start_udp_multicast_listener,
+      udp_multicast::stop_udp_multicast_listener,
+      udp_multicast::send_udp_message
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
           tauri_plugin_log::Builder::default()
             .level(log::LevelFilter::Info)
+            .target(tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Webview))
             .build(),
         )?;
       }

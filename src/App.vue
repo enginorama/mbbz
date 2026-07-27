@@ -6,6 +6,7 @@ import { provideCommandStationStatusSync } from './commandstation/provideCommand
 import { setupDccInputBus } from './connections/ExConnection';
 import { provideTauriSerialTransport } from './connections/transports/serial/provideTauriSerialTransport';
 import { provideWebSerialTransport } from './connections/transports/serial/provideWebSerialTransport';
+import { provideUdpMulticastTransport } from './connections/transports/udpMulticast/provideUdpMulticastTransport';
 import { provideWebSocketTransport } from './connections/transports/websocket/useWebSocketTransport';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
 import DialogContainer from './core/dialogs/core/DialogContainer.vue';
@@ -22,6 +23,7 @@ provideDialog(dialogContainer);
 provideWebSerialTransport();
 provideTauriSerialTransport();
 provideWebSocketTransport();
+provideUdpMulticastTransport();
 </script>
 
 <template>

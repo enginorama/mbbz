@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTauriSerialTransport } from '@/connections/transports/serial/provideTauriSerialTransport';
 import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
+import { useUdpMulticastTransport } from '@/connections/transports/udpMulticast/provideUdpMulticastTransport';
 import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import type { SerialPortInfo } from '@/lib/getSerialPorts';
@@ -21,7 +22,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/core/components/ui/sidebar';
-import { CableIcon, ChevronsUpDown, UnplugIcon } from '@lucide/vue';
+import { CableIcon, ChevronsUpDown, RadioIcon, UnplugIcon } from '@lucide/vue';
 import { computed, ref } from 'vue';
 
 const { isMobile } = useSidebar();
@@ -47,11 +48,20 @@ async function refreshTauriSerialPorts() {
 const { isConnected: websocketConnected, isConnecting: isWebSocketConnecting } =
   useWebSocketTransport();
 
+const {
+  connected: udpMulticastConnected,
+  disconnect: disconnectUdpMulticast,
+  connecting: connectingUdpMulticast,
+} = useUdpMulticastTransport();
+
 const connectionInfo = computed(() => ({
   status:
-    connected.value || tauriSerialConnected.value || websocketConnected.value
+    connected.value || tauriSerialConnected.value || websocketConnected.value || udpMulticastConnected.value
       ? 'connected'
-      : connecting.value || connectingTauriSerial.value || isWebSocketConnecting.value
+      : connecting.value ||
+          connectingTauriSerial.value ||
+          isWebSocketConnecting.value ||
+          connectingUdpMulticast.value
         ? 'connecting'
         : 'disconnected',
   type:
@@ -59,6 +69,7 @@ const connectionInfo = computed(() => ({
       connected.value ? 'Serial' : null,
       tauriSerialConnected.value ? 'Native Serial' : null,
       websocketConnected.value ? 'WebSocket' : null,
+      udpMulticastConnected.value ? 'UDP Multicast' : null,
     ]
       .filter(Boolean)
       .join(', ') || 'No connection',
@@ -141,6 +152,15 @@ const connectionInfo = computed(() => ({
               <SidebarMenuButton @click="disconnectTauriSerial">
                 <CableIcon />
                 {{ $t('globals.disconnect') }} Native Serial
+              </SidebarMenuButton>
+            </DropdownMenuItem>
+          </template>
+          <template v-if="udpMulticastConnected">
+            <DropdownMenuSeparator />
+            <DropdownMenuItem as-child>
+              <SidebarMenuButton @click="disconnectUdpMulticast">
+                <RadioIcon />
+                {{ $t('globals.disconnect') }} UDP Multicast
               </SidebarMenuButton>
             </DropdownMenuItem>
           </template>

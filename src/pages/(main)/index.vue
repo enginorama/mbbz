@@ -4,6 +4,7 @@ import { useCommandStationStatusStore } from '@/commandstation/useCommandStation
 import { useExStationOutputBus } from '@/connections/ExEventBus';
 import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
 import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
+import { useUdpMulticastTransport } from '@/connections/transports/udpMulticast/provideUdpMulticastTransport';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
 import PageLayout from '@/core/components/PageLayout.vue';
@@ -14,13 +15,16 @@ import CardHeader from '@/core/components/ui/card/CardHeader.vue';
 import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import Input from '@/core/components/ui/input/Input.vue';
 import Item from '@/core/components/ui/item/Item.vue';
+import ItemActions from '@/core/components/ui/item/ItemActions.vue';
 import ItemContent from '@/core/components/ui/item/ItemContent.vue';
+import ItemDescription from '@/core/components/ui/item/ItemDescription.vue';
 import ItemTitle from '@/core/components/ui/item/ItemTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import type { TrackMode } from '@/ex-native/parsers/parseTrackConfiguration';
-import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from '@lucide/vue';
+import { isMdnsScanSupported, startMdnsScan, stopMdnsScan, type MdnsServiceInfo } from '@/lib/tauriMdns';
+import { CheckIcon, CloudAlertIcon, RadarIcon, RadioIcon, TriangleAlertIcon } from '@lucide/vue';
 import { useStorage } from '@vueuse/core';
-import { computed } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 const { connect, connected, connecting, disconnect } = useWebSerialTransport();
 const isWebSerialSupported = ExWebSerial.isSupported;
@@ -28,6 +32,13 @@ const commandStationStatusStore = useCommandStationStatusStore();
 const transportStatusStore = useTransportStatusStore();
 const outputBus = useExStationOutputBus();
 const commandStation = useCommandStation();
+
+const {
+  connect: connectUdpMulticast,
+  disconnect: disconnectUdpMulticast,
+  connected: isUdpMulticastConnected,
+  connecting: isUdpMulticastConnecting,
+} = useUdpMulticastTransport();
 
 const websocketAddress = useStorage('websocketAddress', 'ws://dccex.local:2560');
 
@@ -78,6 +89,73 @@ function pause(): void {
 function resume(): void {
   commandStation.sendResumeCabs();
 }
+
+const mdnsServices = ref<MdnsServiceInfo[]>([]);
+const isMdnsScanning = ref(false);
+
+async function startScan(): Promise<void> {
+  mdnsServices.value = [];
+  const started = await startMdnsScan((service) => {
+    const index = mdnsServices.value.findIndex(
+      (s) => s.serviceType === service.serviceType && s.name === service.name,
+    );
+    if (index >= 0) mdnsServices.value[index] = service;
+    else mdnsServices.value.push(service);
+  });
+  isMdnsScanning.value = started;
+}
+
+async function stopScan(): Promise<void> {
+  await stopMdnsScan();
+  isMdnsScanning.value = false;
+}
+
+function useServiceForWebSocket(service: MdnsServiceInfo): void {
+  const host = service.addresses[0] ?? service.hostname;
+  websocketAddress.value = `ws://${host}:${service.port}`;
+}
+
+// DCC-EX command stations advertise a companion UDP multicast broadcast channel (rather than
+// relying on repeat mDNS queries, which some ESP32 mDNS responders handle unreliably once
+// already running) carrying the same live status protocol as the serial/WebSocket transports.
+// Broadcasts arrive via the multicast group, but commands are sent back unicast directly to the
+// device's own resolved address.
+const listeningToServiceName = ref<string | null>(null);
+
+function multicastGroupFor(
+  service: MdnsServiceInfo,
+): { group: string; deviceAddress: string; port: number } | null {
+  const group = service.txt.group;
+  const deviceAddress = service.addresses[0];
+  const port = Number(service.txt.port);
+  if (service.txt.multicast !== 'true' || !group || !deviceAddress || !Number.isFinite(port)) {
+    return null;
+  }
+  return { group, deviceAddress, port };
+}
+
+async function toggleUdpListen(service: MdnsServiceInfo): Promise<void> {
+  if (listeningToServiceName.value === service.name) {
+    await disconnectUdpMulticast();
+    listeningToServiceName.value = null;
+    return;
+  }
+
+  const target = multicastGroupFor(service);
+  if (!target) return;
+
+  if (listeningToServiceName.value) {
+    await disconnectUdpMulticast();
+    listeningToServiceName.value = null;
+  }
+
+  await connectUdpMulticast(target.group, target.deviceAddress, target.port);
+  listeningToServiceName.value = isUdpMulticastConnected.value ? service.name : null;
+}
+
+onUnmounted(() => {
+  if (isMdnsScanning.value) void stopMdnsScan();
+});
 </script>
 
 <template>
@@ -154,6 +232,58 @@ function resume(): void {
               <div>Right now, this is only for local testing.</div>
             </ItemContent>
           </Item>
+        </CardContent>
+      </Card>
+      <Card class="max-w-120" v-if="isMdnsScanSupported">
+        <CardHeader>
+          <CardTitle>mDNS Device Scanner</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button v-if="!isMdnsScanning" @click="startScan">
+            <RadarIcon />
+            Scan for devices
+          </Button>
+          <Button v-else variant="outline" @click="stopScan">
+            <Spinner />
+            Stop scanning
+          </Button>
+          <ul class="mt-4 flex flex-col gap-2">
+            <li v-for="service in mdnsServices" :key="`${service.serviceType}|${service.name}`">
+              <Item variant="outline">
+                <ItemContent>
+                  <ItemTitle>{{ service.name }}</ItemTitle>
+                  <ItemDescription>
+                    {{ service.serviceType }} &middot; {{ service.hostname }}
+                    <template v-if="service.addresses.length"
+                      >({{ service.addresses.join(', ') }})</template
+                    >:{{ service.port }}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <Button
+                    v-if="multicastGroupFor(service)"
+                    :variant="listeningToServiceName === service.name ? 'default' : 'outline'"
+                    size="sm"
+                    :disabled="isUdpMulticastConnecting"
+                    @click="toggleUdpListen(service)"
+                  >
+                    <Spinner v-if="isUdpMulticastConnecting && listeningToServiceName !== service.name" />
+                    <RadioIcon v-else />
+                    {{ listeningToServiceName === service.name ? 'Disconnect' : 'Connect via UDP' }}
+                  </Button>
+                  <Button variant="outline" size="sm" @click="useServiceForWebSocket(service)">
+                    Use for WebSocket
+                  </Button>
+                </ItemActions>
+              </Item>
+            </li>
+            <li
+              v-if="isMdnsScanning && mdnsServices.length === 0"
+              class="text-primary/50 mt-2"
+            >
+              Searching for devices...
+            </li>
+          </ul>
         </CardContent>
       </Card>
       <Card class="max-w-120">

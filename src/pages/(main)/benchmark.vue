@@ -16,7 +16,10 @@ async function startTest(): Promise<void> {
     const ret = await cs.sendAndWaitForResponse({
       command: `<t 0 3 66 ${direction}>`,
       callback: (response) => {
-        if (response.command === 'T' && response.params[2] === direction) return true;
+        // DCC-EX also broadcasts <l> spontaneously (independent of any command we sent), so
+        // without checking the cab, a stray broadcast for a different loco can get consumed by
+        // the wrong iteration's wait here, starving a later iteration of its real response.
+        if (response.command === 'l' && response.params[0] === '3') return true;
       },
       defaultValue: false,
     });

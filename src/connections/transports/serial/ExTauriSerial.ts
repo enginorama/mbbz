@@ -56,7 +56,6 @@ export class ExTauriSerial {
 
     this.dataChannel = new Channel<string>();
     this.dataChannel.onmessage = (msg) => {
-      console.log(`[tauriSerial rx @ ${performance.now().toFixed(1)}]`, JSON.stringify(msg));
       this.onDataCallback(msg);
     };
 
@@ -97,7 +96,6 @@ export class ExTauriSerial {
     if (!this.connected || lines.length === 0) return;
     try {
       const data = lines.map((line) => `${line}\n`).join('');
-      console.log(`[tauriSerial tx @ ${performance.now().toFixed(1)}]`, JSON.stringify(data));
       await invoke('write_serial_port', { data });
     } catch (e) {
       console.warn('Error writing to serial port:', e);
