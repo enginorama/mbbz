@@ -28,7 +28,7 @@ export type CsSensorValue = {
 export class CommandStation {
   private outputBus = useExStationOutputBus();
   private dccInputBus = useExNativeInputBus();
-  private queue = new Queue();
+  private queue = new Queue(10);
 
   public async refreshRoster() {
     void this.queue.add(async () => {
