@@ -31,8 +31,14 @@ pub fn start_udp_multicast_listener(
   on_data: Channel<String>,
 ) -> Result<(), String> {
   let mut guard = state.lock().map_err(|e| e.to_string())?;
-  if guard.is_some() {
-    return Err("A UDP multicast listener is already running".into());
+  // Rather than erroring when a listener is already running, replace it. The frontend's IPC
+  // `Channel` only lives as long as the webview session that created it - after a page reload
+  // (e.g. F5), the Rust-side listener from before the reload is still technically running, but
+  // sending to its (now-defunct) channel would just fail. So any (re)connect request - whether
+  // from a genuinely fresh start or from a reload recovering a still-running backend listener -
+  // tears down whatever's there first and rebinds fresh with the new channel.
+  if let Some(existing) = guard.take() {
+    existing.running.store(false, Ordering::SeqCst);
   }
 
   let group_addr: Ipv4Addr = group
@@ -112,6 +118,15 @@ pub fn stop_udp_multicast_listener(state: State<UdpMulticastState>) -> Result<()
     listener.running.store(false, Ordering::SeqCst);
   }
   Ok(())
+}
+
+// Lets the frontend detect, right after a page reload, whether a listener from before the
+// reload is still running in the backend (which otherwise has no way to know, since its own
+// `connected` state is freshly reinitialized JS state).
+#[tauri::command]
+pub fn is_udp_multicast_listener_running(state: State<UdpMulticastState>) -> Result<bool, String> {
+  let guard = state.lock().map_err(|e| e.to_string())?;
+  Ok(guard.is_some())
 }
 
 #[tauri::command]

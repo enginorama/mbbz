@@ -13,8 +13,7 @@ import ItemTitle from '@/core/components/ui/item/ItemTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { isMdnsScanSupported, startMdnsScan, stopMdnsScan, type MdnsServiceInfo } from '@/lib/tauriMdns';
 import { RadarIcon, RadioIcon } from '@lucide/vue';
-import { StorageSerializers, useStorage } from '@vueuse/core';
-import { onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 const websocketAddress = defineModel<string>('websocketAddress', { required: true });
 
@@ -23,6 +22,7 @@ const {
   disconnect: disconnectUdpMulticast,
   connected: isUdpMulticastConnected,
   connecting: isUdpMulticastConnecting,
+  lastTarget: lastUdpTarget,
 } = useUdpMulticastTransport();
 
 const mdnsServices = ref<MdnsServiceInfo[]>([]);
@@ -54,31 +54,11 @@ function useServiceForWebSocket(service: MdnsServiceInfo): void {
 // relying on repeat mDNS queries, which some ESP32 mDNS responders handle unreliably once
 // already running) carrying the same live status protocol as the serial/WebSocket transports.
 // Broadcasts arrive via the multicast group, but commands are sent back unicast directly to the
-// device's own resolved address.
-const listeningToServiceName = ref<string | null>(null);
-
-interface UdpMulticastTarget {
-  group: string;
-  deviceAddress: string;
-  port: number;
-  serviceName: string;
-}
-
-// Persisted so the last-connected device can be reconnected on a later visit without having to
-// rescan and rediscover it via mDNS again.
-// The default value is `null`, so useStorage can't guess an object serializer from it (it
-// falls back to stringifying via String(), i.e. the literal text "[object Object]") - it must
-// be specified explicitly.
-const lastUdpTarget = useStorage<UdpMulticastTarget | null>('lastUdpMulticastTarget', null, undefined, {
-  serializer: StorageSerializers.object,
-});
-
-// If the transport is already connected (it's provided app-wide, so a remount of this card
-// doesn't reset it) and it matches what we last persisted, reflect that in the UI immediately
-// instead of showing every service as disconnected until the user interacts again.
-if (isUdpMulticastConnected.value && lastUdpTarget.value) {
-  listeningToServiceName.value = lastUdpTarget.value.serviceName;
-}
+// device's own resolved address. The transport itself tracks and persists the last-connected
+// target (see provideUdpMulticastTransport), so this component just reads it.
+const connectedServiceName = computed(() =>
+  isUdpMulticastConnected.value ? (lastUdpTarget.value?.label ?? null) : null,
+);
 
 function multicastGroupFor(
   service: MdnsServiceInfo,
@@ -92,42 +72,34 @@ function multicastGroupFor(
   return { group, deviceAddress, port };
 }
 
-async function connectUdpTo(target: UdpMulticastTarget): Promise<void> {
-  if (listeningToServiceName.value) {
-    await disconnectUdpMulticast();
-    listeningToServiceName.value = null;
-  }
-
-  await connectUdpMulticast(target.group, target.deviceAddress, target.port);
-  if (isUdpMulticastConnected.value) {
-    listeningToServiceName.value = target.serviceName;
-    lastUdpTarget.value = target;
-  }
-}
-
 async function toggleUdpListen(service: MdnsServiceInfo): Promise<void> {
-  if (listeningToServiceName.value === service.name) {
+  if (connectedServiceName.value === service.name) {
     await disconnectUdpMulticast();
-    listeningToServiceName.value = null;
     return;
   }
 
   const target = multicastGroupFor(service);
   if (!target) return;
 
-  await connectUdpTo({ ...target, serviceName: service.name });
+  if (isUdpMulticastConnected.value) {
+    await disconnectUdpMulticast();
+  }
+  await connectUdpMulticast(target.group, target.deviceAddress, target.port, service.name);
 }
 
 async function toggleLastDevice(): Promise<void> {
   if (!lastUdpTarget.value) return;
 
-  if (listeningToServiceName.value === lastUdpTarget.value.serviceName) {
+  if (connectedServiceName.value === lastUdpTarget.value.label) {
     await disconnectUdpMulticast();
-    listeningToServiceName.value = null;
     return;
   }
 
-  await connectUdpTo(lastUdpTarget.value);
+  if (isUdpMulticastConnected.value) {
+    await disconnectUdpMulticast();
+  }
+  const { group, deviceAddress, port, label } = lastUdpTarget.value;
+  await connectUdpMulticast(group, deviceAddress, port, label);
 }
 
 onUnmounted(() => {
@@ -144,18 +116,18 @@ onUnmounted(() => {
       <Item v-if="lastUdpTarget" variant="outline" class="mb-4">
         <ItemContent>
           <ItemTitle>Last connected device</ItemTitle>
-          <ItemDescription>{{ lastUdpTarget.serviceName }}</ItemDescription>
+          <ItemDescription>{{ lastUdpTarget.label }}</ItemDescription>
         </ItemContent>
         <ItemActions>
           <Button
-            :variant="listeningToServiceName === lastUdpTarget.serviceName ? 'default' : 'outline'"
+            :variant="connectedServiceName === lastUdpTarget.label ? 'default' : 'outline'"
             size="sm"
             :disabled="isUdpMulticastConnecting"
             @click="toggleLastDevice"
           >
             <Spinner v-if="isUdpMulticastConnecting" />
             <RadioIcon v-else />
-            {{ listeningToServiceName === lastUdpTarget.serviceName ? 'Disconnect' : 'Reconnect via UDP' }}
+            {{ connectedServiceName === lastUdpTarget.label ? 'Disconnect' : 'Reconnect via UDP' }}
           </Button>
         </ItemActions>
       </Item>
@@ -182,14 +154,14 @@ onUnmounted(() => {
             <ItemActions>
               <Button
                 v-if="multicastGroupFor(service)"
-                :variant="listeningToServiceName === service.name ? 'default' : 'outline'"
+                :variant="connectedServiceName === service.name ? 'default' : 'outline'"
                 size="sm"
                 :disabled="isUdpMulticastConnecting"
                 @click="toggleUdpListen(service)"
               >
-                <Spinner v-if="isUdpMulticastConnecting && listeningToServiceName !== service.name" />
+                <Spinner v-if="isUdpMulticastConnecting && connectedServiceName !== service.name" />
                 <RadioIcon v-else />
-                {{ listeningToServiceName === service.name ? 'Disconnect' : 'Connect via UDP' }}
+                {{ connectedServiceName === service.name ? 'Disconnect' : 'Connect via UDP' }}
               </Button>
               <Button variant="outline" size="sm" @click="useServiceForWebSocket(service)">
                 Use for WebSocket

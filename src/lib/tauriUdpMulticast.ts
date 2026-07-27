@@ -36,3 +36,13 @@ export async function sendUdpMessage(address: string, port: number, data: string
   if (!isTauri()) return;
   await invoke('send_udp_message', { address, port, data });
 }
+
+/**
+ * Whether a UDP multicast listener is currently running in the Tauri backend - notably, this
+ * can be true immediately after a page reload, before anything in this session has called
+ * startUdpMulticastListener, since the backend listener from before the reload keeps running.
+ */
+export async function isUdpMulticastListenerRunning(): Promise<boolean> {
+  if (!isTauri()) return false;
+  return await invoke<boolean>('is_udp_multicast_listener_running');
+}

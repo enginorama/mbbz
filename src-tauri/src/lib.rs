@@ -276,7 +276,8 @@ pub fn run() {
       mdns::stop_mdns_scan,
       udp_multicast::start_udp_multicast_listener,
       udp_multicast::stop_udp_multicast_listener,
-      udp_multicast::send_udp_message
+      udp_multicast::send_udp_message,
+      udp_multicast::is_udp_multicast_listener_running
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {
