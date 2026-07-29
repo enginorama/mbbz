@@ -49,7 +49,7 @@ const navItems = computed<
 </script>
 
 <template>
-  <nav class="flex h-16 w-full items-center justify-around border-t bg-white px-4">
+  <nav class="flex w-full items-start justify-around border-t bg-white px-4 pt-2">
     <RouterLink
       v-for="navItem in navItems"
       :key="navItem.label"
@@ -63,3 +63,9 @@ const navItems = computed<
     </RouterLink>
   </nav>
 </template>
+
+<style scoped>
+nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+</style>

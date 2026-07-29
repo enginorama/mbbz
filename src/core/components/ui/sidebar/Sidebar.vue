@@ -38,7 +38,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
       data-slot="sidebar"
       data-mobile="true"
       :side="side"
-      class="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+      class="bg-sidebar text-sidebar-foreground mobile-sidebar w-(--sidebar-width) [&>button]:hidden"
       :style="{
         '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
       }"
@@ -100,3 +100,10 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
     </div>
   </div>
 </template>
+
+<style>
+.mobile-sidebar {
+  padding-top: calc(env(safe-area-inset-top) + 0.5rem);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+}
+</style>

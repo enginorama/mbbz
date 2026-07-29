@@ -79,6 +79,10 @@ function pause(): void {
 function resume(): void {
   commandStation.sendResumeCabs();
 }
+
+function reload(): void {
+  location.reload();
+}
 </script>
 
 <template>
@@ -88,6 +92,7 @@ function resume(): void {
         <CardHeader>
           <CardTitle>Connect your EX-CommandStation</CardTitle>
         </CardHeader>
+        <Button @click="reload">Reload</Button>
         <CardContent>
           <ul>
             <li v-if="!isWebSerialSupported" class="mt-2 flex items-start gap-2 text-red-500">
