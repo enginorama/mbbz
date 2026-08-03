@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppNumberInput from '@/core/components/AppNumberInput.vue';
 import Accordion from '@/core/components/ui/accordion/Accordion.vue';
 import AccordionContent from '@/core/components/ui/accordion/AccordionContent.vue';
 import AccordionItem from '@/core/components/ui/accordion/AccordionItem.vue';
@@ -13,11 +14,6 @@ import FieldSet from '@/core/components/ui/field/FieldSet.vue';
 import Label from '@/core/components/ui/label/Label.vue';
 import NativeSelect from '@/core/components/ui/native-select/NativeSelect.vue';
 import NativeSelectOption from '@/core/components/ui/native-select/NativeSelectOption.vue';
-import NumberField from '@/core/components/ui/number-field/NumberField.vue';
-import NumberFieldContent from '@/core/components/ui/number-field/NumberFieldContent.vue';
-import NumberFieldDecrement from '@/core/components/ui/number-field/NumberFieldDecrement.vue';
-import NumberFieldIncrement from '@/core/components/ui/number-field/NumberFieldIncrement.vue';
-import NumberFieldInput from '@/core/components/ui/number-field/NumberFieldInput.vue';
 import Switch from '@/core/components/ui/switch/Switch.vue';
 import { syncRefs } from '@vueuse/core';
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
@@ -62,13 +58,7 @@ watch(vPinIsSensorId, (newValue) => {
           <FieldContent>
             <FieldLabel for="vPin"> {{ $t('components.addSensorDialog.vPin') }} </FieldLabel>
           </FieldContent>
-          <NumberField id="vPin" v-model="vPin" :min="0">
-            <NumberFieldContent>
-              <NumberFieldDecrement />
-              <NumberFieldInput ref="firstInputRef" />
-              <NumberFieldIncrement />
-            </NumberFieldContent>
-          </NumberField>
+          <AppNumberInput id="vPin" v-model="vPin" :min="0" />
         </Field>
       </FieldGroup>
     </FieldSet>
@@ -95,13 +85,7 @@ watch(vPinIsSensorId, (newValue) => {
                     $t('components.addSensorDialog.sensorId')
                   }}</FieldLabel>
                 </FieldContent>
-                <NumberField id="sensorId" v-model="sensorId" :min="0" :focus-on-change="false">
-                  <NumberFieldContent>
-                    <NumberFieldDecrement />
-                    <NumberFieldInput />
-                    <NumberFieldIncrement />
-                  </NumberFieldContent>
-                </NumberField>
+                <AppNumberInput id="sensorId" v-model="sensorId" :min="0" class="w-32" />
               </Field>
               <Field>
                 <FieldContent>

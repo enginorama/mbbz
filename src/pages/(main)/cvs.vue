@@ -1,12 +1,8 @@
 <script setup lang="ts">
+import AppNumberInput from '@/core/components/AppNumberInput.vue';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Item from '@/core/components/ui/item/Item.vue';
-import NumberField from '@/core/components/ui/number-field/NumberField.vue';
-import NumberFieldContent from '@/core/components/ui/number-field/NumberFieldContent.vue';
-import NumberFieldDecrement from '@/core/components/ui/number-field/NumberFieldDecrement.vue';
-import NumberFieldIncrement from '@/core/components/ui/number-field/NumberFieldIncrement.vue';
-import NumberFieldInput from '@/core/components/ui/number-field/NumberFieldInput.vue';
 import CvTable from '@/cvs/cv-table/CvTable.vue';
 import CvCard from '@/cvs/CvCard.vue';
 import type { CvData } from '@/cvs/CvData';
@@ -71,13 +67,7 @@ function downloadCsv() {
     </template>
     <Item variant="muted" class="mb-4 flex items-center justify-between gap-4">
       <div class="flex items-center gap-2">
-        <NumberField v-model="cvAddressToAdd" :min="1" :max="1024" class="w-32 bg-white">
-          <NumberFieldContent>
-            <NumberFieldDecrement />
-            <NumberFieldInput @keydown.enter="cvs.add(cvAddressToAdd)" />
-            <NumberFieldIncrement />
-          </NumberFieldContent>
-        </NumberField>
+        <AppNumberInput v-model="cvAddressToAdd" :min="1" :max="1024" class="w-32" />
         <Button variant="outline" @click="cvs.add(cvAddressToAdd)">{{ $t('globals.add') }}</Button>
       </div>
       <div class="flex gap-2">
