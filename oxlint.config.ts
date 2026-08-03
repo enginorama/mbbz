@@ -1,10 +1,10 @@
 import { defineConfig } from 'oxlint';
 
 export default defineConfig({
-  plugins: ['eslint', 'typescript', 'unicorn', 'import', 'node', 'vue', 'vitest', 'promise'],
   options: {
     typeAware: true,
   },
+  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import', 'node', 'promise', 'vitest', 'vue'],
   rules: {
     'unbound-method': 'off',
   },

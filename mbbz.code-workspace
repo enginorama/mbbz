@@ -13,7 +13,7 @@
         "protocol": "https",
       },
     },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
     "tailwindCSS.classFunctions": [
       "cva",
       "cx"

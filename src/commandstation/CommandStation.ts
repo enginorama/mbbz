@@ -55,6 +55,7 @@ export class CommandStation {
         if (packet.command === 'jR' && !packet.params[1]?.startsWith(`"`)) {
           return packet.params.map((param) => Number(param));
         }
+        return undefined;
       },
       defaultValue: [],
     });
@@ -72,6 +73,7 @@ export class CommandStation {
           const name = packet.params[1].substring(1, packet.params[1].length - 1);
           return { address: address, name: name };
         }
+        return undefined;
       },
       defaultValue: null,
     });
@@ -96,6 +98,7 @@ export class CommandStation {
         if (packet.command === 'jT' && !packet.params[2]?.startsWith(`"`)) {
           return packet.params.map((param) => Number(param));
         }
+        return undefined;
       },
       defaultValue: [],
     });
@@ -112,6 +115,7 @@ export class CommandStation {
             status: packet.params[1] ?? '',
           };
         }
+        return undefined;
       },
       defaultValue: null,
     });
@@ -124,6 +128,7 @@ export class CommandStation {
         if (packet.command === 'v' && Number(packet.params[0]) === address) {
           return Number(packet.params[1] ?? -1);
         }
+        return undefined;
       },
       defaultValue: -1,
     });
@@ -143,6 +148,7 @@ export class CommandStation {
             pullUp: sensorPullUp,
           };
         }
+        return undefined;
       },
     });
   }

@@ -122,7 +122,7 @@ export class ExWebSerial {
     if (!writer) return;
     try {
       for (const line of lines) {
-        await writer.write(`${line}` + '\n');
+        await writer.write(`${line}\n`);
       }
     } catch (e) {
       console.warn('Error writing to stream:', e);
