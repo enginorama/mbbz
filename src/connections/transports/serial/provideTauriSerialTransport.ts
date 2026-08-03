@@ -47,10 +47,11 @@ export function provideTauriSerialTransport() {
 
   const connecting = ref(false);
 
-  const { open, close, connected, writeToStream, isSupported, getAvailablePorts } =
-    useTauriSerial((msg) => {
+  const { open, close, connected, writeToStream, isSupported, getAvailablePorts } = useTauriSerial(
+    (msg) => {
       normalizer.parseChunk(msg);
-    });
+    },
+  );
 
   outputBus.on((msg) => {
     if (connected.value) {

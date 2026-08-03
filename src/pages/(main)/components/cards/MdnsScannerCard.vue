@@ -11,7 +11,12 @@ import ItemContent from '@/core/components/ui/item/ItemContent.vue';
 import ItemDescription from '@/core/components/ui/item/ItemDescription.vue';
 import ItemTitle from '@/core/components/ui/item/ItemTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
-import { isMdnsScanSupported, startMdnsScan, stopMdnsScan, type MdnsServiceInfo } from '@/lib/tauriMdns';
+import {
+  isMdnsScanSupported,
+  startMdnsScan,
+  stopMdnsScan,
+  type MdnsServiceInfo,
+} from '@/lib/tauriMdns';
 import { RadarIcon, RadioIcon } from '@lucide/vue';
 import { computed, onUnmounted, ref } from 'vue';
 

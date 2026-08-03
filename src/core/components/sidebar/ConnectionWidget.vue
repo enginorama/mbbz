@@ -56,7 +56,10 @@ const {
 
 const connectionInfo = computed(() => ({
   status:
-    connected.value || tauriSerialConnected.value || websocketConnected.value || udpMulticastConnected.value
+    connected.value ||
+    tauriSerialConnected.value ||
+    websocketConnected.value ||
+    udpMulticastConnected.value
       ? 'connected'
       : connecting.value ||
           connectingTauriSerial.value ||

@@ -1,7 +1,16 @@
 import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
 import { isUdpMulticastListenerRunning } from '@/lib/tauriUdpMulticast';
 import { StorageSerializers, useStorage } from '@vueuse/core';
-import { inject, onUnmounted, provide, readonly, ref, watch, type InjectionKey, type Ref } from 'vue';
+import {
+  inject,
+  onUnmounted,
+  provide,
+  readonly,
+  ref,
+  watch,
+  type InjectionKey,
+  type Ref,
+} from 'vue';
 import { toast } from 'vue-sonner';
 import { useExStationInputBus, useExStationOutputBus } from '../../ExEventBus';
 import { useConnectionLogger } from '../../useConnectionLogger';
@@ -48,9 +57,14 @@ export function provideUdpMulticastTransport() {
   // The default value is `null`, so useStorage can't guess an object serializer from it (it
   // falls back to stringifying via String(), i.e. the literal text "[object Object]") - it must
   // be specified explicitly.
-  const lastTarget = useStorage<UdpMulticastTarget | null>('lastUdpMulticastTarget', null, undefined, {
-    serializer: StorageSerializers.object,
-  });
+  const lastTarget = useStorage<UdpMulticastTarget | null>(
+    'lastUdpMulticastTarget',
+    null,
+    undefined,
+    {
+      serializer: StorageSerializers.object,
+    },
+  );
 
   const { open, close, send, connected, isSupported } = useUdpMulticast((msg) => {
     normalizer.parseChunk(msg);

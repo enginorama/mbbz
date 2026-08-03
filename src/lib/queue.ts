@@ -2,7 +2,7 @@ export class Queue {
   private queue: Array<() => Promise<unknown>> = [];
   private running = false;
 
-  constructor(private delayBetweenTasksMs: number = 100) { }
+  constructor(private delayBetweenTasksMs: number = 100) {}
 
   public add<T>(task: () => Promise<T>) {
     return new Promise<T>((resolve, reject) => {
