@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerHandle,
@@ -13,12 +12,27 @@ import {
 
 const props = withDefaults(
   defineProps<{
+    title?: string;
+    description?: string;
     dismissible?: boolean;
+    teleport?: boolean;
   }>(),
   {
     dismissible: true,
+    teleport: true,
   },
 );
+
+const emit = defineEmits<{
+  closed: [];
+}>();
+
+function handleContentAnimationEnd(event: AnimationEvent) {
+  const target = event.target as HTMLElement;
+  if (target === event.currentTarget && target.dataset.state === 'closed') {
+    emit('closed');
+  }
+}
 
 function handlePointerDownOutside(event: PointerDownOutsideEvent) {
   if (!props.dismissible) {
@@ -39,11 +53,12 @@ function handlePointerOrTouchDown(event: PointerEvent | TouchEvent) {
 
 <template>
   <DrawerRoot>
-    <DrawerPortal>
+    <DrawerPortal :disabled="!teleport">
       <DrawerOverlay class="DrawerOverlay fixed inset-0 z-30 bg-black/40" />
       <DrawerContent
-        class="DrawerContent fixed inset-x-0 bottom-0 z-[100] mx-auto flex max-h-[80vh] max-w-[500px] flex-col overflow-auto rounded-t-[16px] bg-white outline-none"
+        class="DrawerContent fixed inset-x-0 bottom-0 z-100 mx-auto flex max-h-[80vh] max-w-125 flex-col overflow-auto rounded-t-2xl bg-white outline-none"
         @pointer-down-outside="handlePointerDownOutside"
+        @animationend="handleContentAnimationEnd"
       >
         <DrawerHandle
           v-if="dismissible"
@@ -55,38 +70,12 @@ function handlePointerOrTouchDown(event: PointerEvent | TouchEvent) {
           @touchstart="handlePointerOrTouchDown"
         >
           <DrawerTitle class="text-mauve12 m-0 text-[17px] font-semibold">
-            Edit profile
+            {{ title }}
           </DrawerTitle>
-          <DrawerDescription class="text-mauve11 mt-[10px] mb-5 text-sm leading-normal">
-            Make changes to your profile here. Swipe down or click close when you're done.
+          <DrawerDescription class="text-mauve11 mt-2.5 mb-5 text-sm leading-normal">
+            {{ description }}
           </DrawerDescription>
-          <DrawerDescription
-            data-no-swipe
-            class="text-mauve11 mt-[10px] mb-5 text-sm leading-normal"
-          >
-            Something so cool??
-          </DrawerDescription>
-
-          <fieldset class="mb-[15px] flex items-center gap-5">
-            <label class="text-grass11 w-[90px] text-right text-sm" for="name"> Name </label>
-            <input
-              id="name"
-              class="text-grass11 shadow-green7 focus:shadow-green8 inline-flex h-[35px] w-full flex-1 items-center justify-center rounded-lg bg-stone-50 px-[10px] text-sm leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-              value="Pedro Duarte"
-            />
-          </fieldset>
-          <div class="mt-[25px] flex justify-end">
-            <DrawerClose as-child>
-              <button
-                class="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-lg px-[15px] text-sm leading-none font-semibold focus:shadow-[0_0_0_2px] focus:outline-none"
-              >
-                Save changes
-              </button>
-            </DrawerClose>
-          </div>
-          <div class="overflow-auto">
-            <div v-for="i in 30" :key="i">{{ i }}</div>
-          </div>
+          <slot></slot>
         </div>
       </DrawerContent>
     </DrawerPortal>
@@ -120,6 +109,10 @@ function handlePointerOrTouchDown(event: PointerEvent | TouchEvent) {
 .DrawerContent[data-swiping] {
   transition-duration: 0ms;
   user-select: none;
+}
+
+.DrawerContent {
+  padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
 }
 
 @keyframes drawer-overlay-in {

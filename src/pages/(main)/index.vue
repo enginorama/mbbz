@@ -224,13 +224,12 @@ function reload(): void {
         </CardContent>
       </Card>
     </div>
-    <AppDrawer v-model:open="showDrawer">
-      <template #header>
-        <h2 class="text-lg font-medium">Drawer Header</h2>
-      </template>
-      <template #content>
-        <p>This is the content of the drawer.</p>
-      </template>
+    <AppDrawer
+      v-model:open="showDrawer"
+      title="Drawer Header"
+      description="This is the content of the drawer."
+    >
+      <div>Hallo!</div>
     </AppDrawer>
   </PageLayout>
 </template>
