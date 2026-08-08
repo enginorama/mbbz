@@ -6,6 +6,7 @@ import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
 import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
+import AppDrawer from '@/core/components/drawer/AppDrawer.vue';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
@@ -20,7 +21,7 @@ import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import type { TrackMode } from '@/ex-native/parsers/parseTrackConfiguration';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from '@lucide/vue';
 import { useStorage } from '@vueuse/core';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import MdnsScannerCard from './components/cards/MdnsScannerCard.vue';
 
 const { connect, connected, connecting, disconnect } = useWebSerialTransport();
@@ -31,6 +32,8 @@ const outputBus = useExStationOutputBus();
 const commandStation = useCommandStation();
 
 const websocketAddress = useStorage('websocketAddress', 'ws://dccex.local:2560');
+
+const showDrawer = ref(false);
 
 const powerInfo = computed<Array<{ track: string; mode?: TrackMode; on?: boolean }>>(() => {
   const trackNames = [
@@ -88,6 +91,7 @@ function reload(): void {
 <template>
   <PageLayout title="Welcome to mbbz" subtitle="Manage and control your DCC-EX layout">
     <div class="flex flex-col gap-8">
+      <Button @click="showDrawer = !showDrawer">Toggle Drawer</Button>
       <Card class="max-w-120">
         <CardHeader>
           <CardTitle>Connect your EX-CommandStation</CardTitle>
@@ -220,5 +224,13 @@ function reload(): void {
         </CardContent>
       </Card>
     </div>
+    <AppDrawer v-model:open="showDrawer">
+      <template #header>
+        <h2 class="text-lg font-medium">Drawer Header</h2>
+      </template>
+      <template #content>
+        <p>This is the content of the drawer.</p>
+      </template>
+    </AppDrawer>
   </PageLayout>
 </template>
