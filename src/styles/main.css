@@ -3,6 +3,10 @@
 @import './shadcn.css';
 @import 'vue-sonner/style.css';
 
+:root {
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 body {
   font-family: 'Inter', sans-serif;
 }

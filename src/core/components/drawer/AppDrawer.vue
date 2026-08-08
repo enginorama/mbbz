@@ -112,7 +112,7 @@ function handlePointerOrTouchDown(event: PointerEvent | TouchEvent) {
 }
 
 .DrawerContent {
-  padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  padding-bottom: var(--app-safe-bottom);
 }
 
 @keyframes drawer-overlay-in {

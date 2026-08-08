@@ -66,6 +66,6 @@ const navItems = computed<
 
 <style scoped>
 nav {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--app-safe-bottom);
 }
 </style>

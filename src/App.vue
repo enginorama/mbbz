@@ -24,6 +24,22 @@ provideWebSerialTransport();
 provideTauriSerialTransport();
 provideWebSocketTransport();
 provideUdpMulticastTransport();
+
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  const ua = navigator.userAgent;
+  const isFirefoxAndroid = /Android/i.test(ua) && /Firefox/i.test(ua);
+  if (isFirefoxAndroid) {
+    const versionString = ua.match(/Firefox\/(\d+)/)?.[1];
+    const firefoxVersion = versionString ? parseInt(versionString, 10) : null;
+
+    if (firefoxVersion && firefoxVersion >= 150) {
+      // Firefox Android 150+ reports a bogus safe-area-inset-bottom
+      document.documentElement.style.setProperty('--app-safe-bottom', '0px');
+    }
+  }
+});
 </script>
 
 <template>
