@@ -7,6 +7,7 @@ import {
   DrawerPortal,
   DrawerRoot,
   DrawerTitle,
+  DrawerTrigger,
   type PointerDownOutsideEvent,
 } from 'reka-ui';
 
@@ -34,7 +35,7 @@ function handleContentAnimationEnd(event: AnimationEvent) {
   }
 }
 
-function handlePointerDownOutside(event: PointerDownOutsideEvent) {
+function handleQuickDismissAttempt(event: PointerDownOutsideEvent | KeyboardEvent) {
   if (!props.dismissible) {
     event.preventDefault();
   }
@@ -52,12 +53,16 @@ function handlePointerOrTouchDown(event: PointerEvent | TouchEvent) {
 </script>
 
 <template>
-  <DrawerRoot>
+  <DrawerRoot v-slot="{ close }">
+    <DrawerTrigger v-if="$slots.trigger" as-child>
+      <slot name="trigger"></slot>
+    </DrawerTrigger>
     <DrawerPortal :disabled="!teleport">
       <DrawerOverlay class="DrawerOverlay fixed inset-0 z-30 bg-black/40" />
       <DrawerContent
         class="DrawerContent fixed inset-x-0 bottom-0 z-100 mx-auto flex max-h-[80vh] max-w-125 flex-col overflow-auto rounded-t-2xl bg-white outline-none"
-        @pointer-down-outside="handlePointerDownOutside"
+        @pointer-down-outside="handleQuickDismissAttempt"
+        @escape-key-down="handleQuickDismissAttempt"
         @animationend="handleContentAnimationEnd"
       >
         <DrawerHandle
@@ -75,7 +80,7 @@ function handlePointerOrTouchDown(event: PointerEvent | TouchEvent) {
           <DrawerDescription class="text-mauve11 mt-2.5 mb-5 text-sm leading-normal">
             {{ description }}
           </DrawerDescription>
-          <slot></slot>
+          <slot :close="close"></slot>
         </div>
       </DrawerContent>
     </DrawerPortal>

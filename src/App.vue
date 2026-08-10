@@ -8,6 +8,7 @@ import { provideTauriSerialTransport } from './connections/transports/serial/pro
 import { provideWebSerialTransport } from './connections/transports/serial/provideWebSerialTransport';
 import { provideUdpMulticastTransport } from './connections/transports/udpMulticast/provideUdpMulticastTransport';
 import { provideWebSocketTransport } from './connections/transports/websocket/useWebSocketTransport';
+import SheetStack from './core/components/AppSheet/SheetStack.vue';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
 import DialogContainer from './core/dialogs/core/DialogContainer.vue';
 import { provideDialog } from './core/dialogs/core/useDialog';
@@ -26,6 +27,9 @@ provideWebSocketTransport();
 provideUdpMulticastTransport();
 
 import { onMounted } from 'vue';
+import { provideAppSheet } from './core/components/AppSheet/useAppSheet.ts';
+
+const { stack, remove } = provideAppSheet();
 
 onMounted(() => {
   const ua = navigator.userAgent;
@@ -52,6 +56,7 @@ onMounted(() => {
       ref="dialogContainer"
       @update-is-any-dialog-open="isAnyDialogOpen = $event"
     />
+    <SheetStack :stack="stack" :remove="remove" />
     <Sonner richColors />
   </div>
 </template>

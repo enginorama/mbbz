@@ -6,7 +6,11 @@ import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
 import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
-import AppDrawer from '@/core/components/drawer/AppDrawer.vue';
+import AddSensorSheet from '@/core/components/AppSheet/AddSensorSheet.vue';
+import AppDialog from '@/core/components/AppSheet/AppDialog.vue';
+import AppDrawer from '@/core/components/AppSheet/AppDrawer.vue';
+import AppSheet from '@/core/components/AppSheet/AppSheet.vue';
+import { useAppSheet } from '@/core/components/AppSheet/useAppSheet.ts';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
@@ -21,6 +25,7 @@ import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import type { TrackMode } from '@/ex-native/parsers/parseTrackConfiguration';
 import { CheckIcon, CloudAlertIcon, TriangleAlertIcon } from '@lucide/vue';
 import { useStorage } from '@vueuse/core';
+import { DialogClose } from 'reka-ui';
 import { computed, ref } from 'vue';
 import MdnsScannerCard from './components/cards/MdnsScannerCard.vue';
 
@@ -34,7 +39,7 @@ const commandStation = useCommandStation();
 const websocketAddress = useStorage('websocketAddress', 'ws://dccex.local:2560');
 
 const showDrawer = ref(false);
-
+const showDialog = ref(false);
 const powerInfo = computed<Array<{ track: string; mode?: TrackMode; on?: boolean }>>(() => {
   const trackNames = [
     ...new Set([
@@ -86,12 +91,39 @@ function resume(): void {
 function reload(): void {
   location.reload();
 }
+
+const { show } = useAppSheet();
+
+async function showTest() {
+  const value = await show(AddSensorSheet, {});
+  console.log('showTest value:', value);
+}
 </script>
 
 <template>
   <PageLayout title="Welcome to mbbz" subtitle="Manage and control your DCC-EX layout">
     <div class="flex flex-col gap-8">
-      <Button @click="showDrawer = !showDrawer">Toggle Drawer</Button>
+      <Button @click="showTest">Show Add Sensor Sheet CODE</Button>
+      <AddSensorSheet v-model:open="showDialog"></AddSensorSheet>
+      <AppSheet title="Sheet Header" description="This is the content of the sheet.">
+        <template #trigger>
+          <Button>Open Sheet</Button>
+        </template>
+        <template #default="{ close }">
+          HAHAAAAAAAAAAAAAAAA!!
+          <Button @click="close">CLOSE</Button>
+        </template>
+      </AppSheet>
+
+      <!-- <Button @click="showDrawer = !showDrawer">Toggle Drawer</Button> -->
+      <Button @click="showDialog = !showDialog">Toggle Dialog</Button>
+      <AppDialog :dismissible="false">
+        <template #trigger>
+          <Button>Open Dialog</Button>
+        </template>
+        HAHAAAAAAAAAAAAAAAA!!
+        <DialogClose> CLOSE </DialogClose>
+      </AppDialog>
       <Card class="max-w-120">
         <CardHeader>
           <CardTitle>Connect your EX-CommandStation</CardTitle>
@@ -231,5 +263,6 @@ function reload(): void {
     >
       <div>Hallo!</div>
     </AppDrawer>
+    <!-- <AppDialog v-model:open="showDialog"> DIALOG!!!!! </AppDialog> -->
   </PageLayout>
 </template>
