@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCommandStation } from '@/commandstation/useCommandStation';
 import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
+import { useAppSheet } from '@/core/components/AppSheet/useAppSheet';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import Empty from '@/core/components/ui/empty/Empty.vue';
@@ -16,8 +17,7 @@ import TableCell from '@/core/components/ui/table/TableCell.vue';
 import TableHead from '@/core/components/ui/table/TableHead.vue';
 import TableHeader from '@/core/components/ui/table/TableHeader.vue';
 import TableRow from '@/core/components/ui/table/TableRow.vue';
-import { useDialog } from '@/core/dialogs/core/useDialog';
-import AddSensorDialog from '@/sensors/AddSensorDialog.vue';
+import AddSensorSheet from '@/sensors/AddSensorSheet.vue';
 import LocalSensorList from '@/sensors/LocalSensorList.vue';
 import type { SensorInfo } from '@/sensors/SensorInfo';
 import { useLocalSensorStore } from '@/sensors/useLocalSensorStore';
@@ -59,10 +59,10 @@ async function fetchSensorValues() {
   fetchingSensorValues.value = false;
 }
 
-const dialog = useDialog();
+const { show } = useAppSheet();
 
 async function addSensor() {
-  const newSensorConfig = await dialog.show(AddSensorDialog, {});
+  const newSensorConfig = await show(AddSensorSheet, {});
   if (!newSensorConfig) return;
   const { sensorId, vPin, pullUp } = newSensorConfig;
   localSensorStore.addSensor({

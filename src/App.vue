@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import { setupCabStateSync } from './cabs/state/setupCabStateSync';
 import { provideCommandStationStatusSync } from './commandstation/provideCommandStationStatusSync';
@@ -10,8 +10,6 @@ import { provideUdpMulticastTransport } from './connections/transports/udpMultic
 import { provideWebSocketTransport } from './connections/transports/websocket/useWebSocketTransport';
 import SheetStack from './core/components/AppSheet/SheetStack.vue';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
-import DialogContainer from './core/dialogs/core/DialogContainer.vue';
-import { provideDialog } from './core/dialogs/core/useDialog';
 
 setupDccInputBus();
 setupCabStateSync();
@@ -19,8 +17,6 @@ provideCommandStationStatusSync();
 
 const isAnyDialogOpen = ref(false);
 
-const dialogContainer = useTemplateRef('dialogContainer');
-provideDialog(dialogContainer);
 provideWebSerialTransport();
 provideTauriSerialTransport();
 provideWebSocketTransport();
@@ -51,11 +47,6 @@ onMounted(() => {
     <div class="relative z-0" :inert="isAnyDialogOpen">
       <RouterView />
     </div>
-    <DialogContainer
-      class="fixed inset-0 z-1"
-      ref="dialogContainer"
-      @update-is-any-dialog-open="isAnyDialogOpen = $event"
-    />
     <SheetStack :stack="stack" :remove="remove" />
     <Sonner richColors />
   </div>

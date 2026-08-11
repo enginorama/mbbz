@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppNumberInput from '@/core/components/AppNumberInput.vue';
+import AppSheet from '@/core/components/AppSheet/AppSheet.vue';
 import Accordion from '@/core/components/ui/accordion/Accordion.vue';
 import AccordionContent from '@/core/components/ui/accordion/AccordionContent.vue';
 import AccordionItem from '@/core/components/ui/accordion/AccordionItem.vue';
@@ -17,7 +18,6 @@ import NativeSelectOption from '@/core/components/ui/native-select/NativeSelectO
 import Switch from '@/core/components/ui/switch/Switch.vue';
 import { syncRefs } from '@vueuse/core';
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
-import AppSheet from './AppSheet.vue';
 
 const emit = defineEmits<{
   'update:value': [value: { sensorId: number; vPin: number; pullUp: '1' | '0' } | undefined];
