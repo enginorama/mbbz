@@ -98,7 +98,10 @@ State is spread across four mechanisms with no clear layering:
 `transportStatusStore.setStatus('webSocket'/'webSerial'/'tauriSerial'/'udpMulticast')` on a plain
 `Record<string, ...>`. No enum/union type; a typo silently creates an untracked key.
 
-**Status:** [ ] open
+**Status:** [x] done — `useTransportStatusStore` now keys on the existing `TransportId` union from
+`types.ts` (`Partial<Record<TransportId, TransportStatus>>`) and `setStatus` accepts `TransportId`,
+so a typo is a compile error instead of silently creating an untracked key. The status literal is
+typed via a `TransportStatus` union.
 
 ### 8. Router history ignores Tauri
 
@@ -106,7 +109,10 @@ State is spread across four mechanisms with no clear layering:
 native build sets neither, so it gets `createWebHistory`, which typically breaks deep-links/refresh
 on the custom `tauri://` protocol.
 
-**Status:** [ ] open
+**Status:** [x] done — `main.ts` now uses `isTauri()` from `@tauri-apps/api/core` (the same detection
+used by `tauriMdns.ts`/`tauriUdpMulticast.ts`) alongside the existing env flags, so the Tauri native
+build gets `createWebHashHistory` instead of `createWebHistory`. Tauri v2 serves the SPA over the
+custom `tauri://` protocol with no path rewriting, so hash history is required for deep-links/refresh.
 
 ### 9. Minor issues
 

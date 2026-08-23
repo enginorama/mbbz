@@ -4,6 +4,7 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { createApp } from 'vue';
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+import { isTauri } from '@tauri-apps/api/core';
 
 import { handleHotUpdate, routes } from 'vue-router/auto-routes';
 
@@ -12,11 +13,16 @@ import messages from '@intlify/unplugin-vue-i18n/messages';
 import { createI18n } from 'vue-i18n';
 import App from './App.vue';
 
+// Tauri v2 serves the SPA over a custom `tauri://` protocol with no path rewriting, so deep
+// links / refreshes only work with a hash history. GitHub Pages and Electron share the same
+// limitation, so all three use hash history; plain web deployments get real history.
+const useHashHistory =
+  isTauri() || import.meta.env.VITE_GITHUB_PAGES || import.meta.env.VITE_ELECTRON;
+
 const router = createRouter({
-  history:
-    import.meta.env.VITE_GITHUB_PAGES || import.meta.env.VITE_ELECTRON
-      ? createWebHashHistory(import.meta.env.BASE_URL)
-      : createWebHistory(import.meta.env.BASE_URL),
+  history: useHashHistory
+    ? createWebHashHistory(import.meta.env.BASE_URL)
+    : createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 
