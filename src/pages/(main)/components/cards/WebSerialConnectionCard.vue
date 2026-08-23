@@ -9,7 +9,7 @@ import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { CheckIcon, TriangleAlertIcon } from '@lucide/vue';
 
 const connectionManager = useConnectionManager();
-const webSerial = connectionManager.get('webSerial')!;
+const webSerial = connectionManager.get('webSerial');
 
 const connect = () => void connectionManager.connect('webSerial', { kind: 'webSerial' });
 const disconnect = () => void connectionManager.disconnect('webSerial');

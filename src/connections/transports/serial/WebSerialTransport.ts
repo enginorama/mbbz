@@ -5,7 +5,7 @@ import { useConnectionLogger } from '@/connections/useConnectionLogger';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import type { DccTransport, TransportConnectOptions } from '@/connections/types';
 
-export class WebSerialTransport implements DccTransport {
+export class WebSerialTransport implements DccTransport<'webSerial'> {
   readonly id = 'webSerial' as const;
   readonly isSupported = typeof navigator !== 'undefined' && 'serial' in navigator;
   readonly connected = ref(false);
@@ -20,8 +20,7 @@ export class WebSerialTransport implements DccTransport {
     this.dataHandler = fn;
   }
 
-  async connect(opts: TransportConnectOptions): Promise<boolean> {
-    if (opts.kind !== 'webSerial') return false;
+  async connect(opts: TransportConnectOptions<'webSerial'>): Promise<boolean> {
     if (!this.isSupported) return false;
     if (this.connected.value) return true;
 

@@ -14,7 +14,7 @@ import { TriangleAlertIcon } from '@lucide/vue';
 const websocketAddress = defineModel<string>('websocketAddress', { required: true });
 
 const connectionManager = useConnectionManager();
-const websocket = connectionManager.get('websocket')!;
+const websocket = connectionManager.get('websocket');
 const isConnected = websocket.connected;
 const isConnecting = websocket.connecting;
 
@@ -33,16 +33,8 @@ const disconnectWebSocket = () => {
       <CardTitle>WebSocket Connection</CardTitle>
     </CardHeader>
     <CardContent>
-      <Input
-        class="mb-4"
-        v-model="websocketAddress"
-        :disabled="isConnecting || isConnected"
-      />
-      <Button
-        @click="connectWebSocketHandler"
-        v-if="!isConnected"
-        :disabled="isConnecting"
-      >
+      <Input class="mb-4" v-model="websocketAddress" :disabled="isConnecting || isConnected" />
+      <Button @click="connectWebSocketHandler" v-if="!isConnected" :disabled="isConnecting">
         Connect to WebSocket Server
       </Button>
       <Button @click="disconnectWebSocket" v-if="isConnected" variant="outline">

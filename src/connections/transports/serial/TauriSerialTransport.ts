@@ -6,7 +6,7 @@ import { useConnectionLogger } from '@/connections/useConnectionLogger';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import type { DccTransport, TransportConnectOptions } from '@/connections/types';
 
-export class TauriSerialTransport implements DccTransport {
+export class TauriSerialTransport implements DccTransport<'tauriSerial'> {
   readonly id = 'tauriSerial' as const;
   readonly isSupported = ExTauriSerial.isSupported;
   readonly connected = ref(false);
@@ -21,8 +21,7 @@ export class TauriSerialTransport implements DccTransport {
     this.dataHandler = fn;
   }
 
-  async connect(opts: TransportConnectOptions): Promise<boolean> {
-    if (opts.kind !== 'tauriSerial') return false;
+  async connect(opts: TransportConnectOptions<'tauriSerial'>): Promise<boolean> {
     if (!this.isSupported) return false;
     if (this.connected.value) return true;
 

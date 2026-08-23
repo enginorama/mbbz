@@ -4,7 +4,7 @@ import { useConnectionLogger } from '@/connections/useConnectionLogger';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import type { DccTransport, TransportConnectOptions } from '@/connections/types';
 
-export class WebSocketTransport implements DccTransport {
+export class WebSocketTransport implements DccTransport<'websocket'> {
   readonly id = 'websocket' as const;
   readonly isSupported = true;
   readonly connected = ref(false);
@@ -19,12 +19,8 @@ export class WebSocketTransport implements DccTransport {
     this.dataHandler = fn;
   }
 
-  connect(opts: TransportConnectOptions): Promise<boolean> {
+  connect(opts: TransportConnectOptions<'websocket'>): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      if (opts.kind !== 'websocket') {
-        resolve(false);
-        return;
-      }
       if (this.socket) {
         toast.warning('Already connected');
         resolve(false);

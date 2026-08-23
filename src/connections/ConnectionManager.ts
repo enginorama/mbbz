@@ -2,7 +2,7 @@ import { inject, provide, ref, type InjectionKey, type Ref } from 'vue';
 import { useExNativeInputBus } from '@/connections/ExEventBus';
 import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
 import { tokenizeExNativeString } from '@/ex-native/ExNativeTokenizer';
-import type { DccTransport, TransportConnectOptions, TransportId } from './types';
+import type { DccTransport, TransportConnectOptions, TransportId, TransportMap } from './types';
 
 /**
  * The orchestrator for all transports. Transports are pure I/O adapters registered here; the
@@ -30,9 +30,9 @@ export class ConnectionManager {
   });
 
   /** Registers a transport and wires its inbound data into the shared decoder. */
-  register(t: DccTransport) {
-    this.transports.set(t.id, t);
-    t.setDataHandler((data) => this.normalizer.parseChunk(data));
+  register<Id extends TransportId>(transport: TransportMap[Id] & DccTransport<Id>) {
+    this.transports.set(transport.id, transport);
+    transport.setDataHandler((data) => this.normalizer.parseChunk(data));
   }
 
   unregister(id: TransportId) {
@@ -42,8 +42,12 @@ export class ConnectionManager {
     }
   }
 
-  get(id: TransportId): DccTransport | undefined {
-    return this.transports.get(id);
+  get<Id extends TransportId>(id: Id): TransportMap[Id] {
+    const transport = this.transports.get(id);
+    if (!transport) {
+      throw new Error(`Transport "${id}" is not registered`);
+    }
+    return transport as TransportMap[Id];
   }
 
   get activeTransportId(): Readonly<Ref<TransportId | null>> {
@@ -56,8 +60,11 @@ export class ConnectionManager {
   }
 
   /** Connects `id`, making it the single active connection. Returns whether it connected. */
-  async connect(id: TransportId, opts: TransportConnectOptions): Promise<boolean> {
-    const transport = this.transports.get(id);
+  async connect<Id extends TransportId>(
+    id: Id,
+    opts: TransportConnectOptions<Id>,
+  ): Promise<boolean> {
+    const transport = this.transports.get(id) as DccTransport<Id> | undefined;
     if (!transport) return false;
     const previous = this.active;
     if (previous && previous.id !== id) {

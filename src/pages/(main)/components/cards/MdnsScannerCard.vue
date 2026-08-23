@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useConnectionManager } from '@/connections/ConnectionManager';
-import { UdpMulticastTransport } from '@/connections/transports/udpMulticast/UdpMulticastTransport';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -24,12 +23,17 @@ import { computed, onUnmounted, ref } from 'vue';
 const websocketAddress = defineModel<string>('websocketAddress', { required: true });
 
 const connectionManager = useConnectionManager();
-const udp = connectionManager.get('udpMulticast')! as UdpMulticastTransport;
+const udp = connectionManager.get('udpMulticast');
 const isUdpMulticastConnected = udp.connected;
 const isUdpMulticastConnecting = udp.connecting;
 const lastUdpTarget = udp.lastTarget;
 
-async function connectUdpMulticast(group: string, deviceAddress: string, port: number, label: string) {
+async function connectUdpMulticast(
+  group: string,
+  deviceAddress: string,
+  port: number,
+  label: string,
+) {
   await connectionManager.connect('udpMulticast', {
     kind: 'udpMulticast',
     group,

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useConnectionManager } from '@/connections/ConnectionManager';
-import { TauriSerialTransport } from '@/connections/transports/serial/TauriSerialTransport';
 import type { SerialPortInfo } from '@/lib/getSerialPorts';
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar';
 import {
@@ -27,10 +26,10 @@ const { isMobile } = useSidebar();
 
 const manager = useConnectionManager();
 
-const webSerial = manager.get('webSerial')!;
-const tauriSerial = manager.get('tauriSerial')! as TauriSerialTransport;
-const websocket = manager.get('websocket')!;
-const udp = manager.get('udpMulticast')!;
+const webSerial = manager.get('webSerial');
+const tauriSerial = manager.get('tauriSerial');
+const websocket = manager.get('websocket');
+const udp = manager.get('udpMulticast');
 
 const webSerialConnected = webSerial.connected;
 const webSerialConnecting = webSerial.connecting;
@@ -128,7 +127,9 @@ function isActiveTransport(id: string): boolean {
                   'text-yellow-500': connectionInfo.status === 'connecting',
                   'text-destructive': connectionInfo.status === 'disconnected',
                 }"
-                >{{ connectionInfo.active ? `Active: ${connectionInfo.active}` : connectionInfo.status }}</span
+                >{{
+                  connectionInfo.active ? `Active: ${connectionInfo.active}` : connectionInfo.status
+                }}</span
               >
             </div>
             <ChevronsUpDown class="ml-auto size-4" />
@@ -145,7 +146,9 @@ function isActiveTransport(id: string): boolean {
               <SidebarMenuButton @click="connectWebSerial" :disabled="webSerialConnecting">
                 <CableIcon />
                 {{ $t('globals.connect') }} Serial
-                <span v-if="isActiveTransport('webSerial')" class="ml-auto text-xs text-green-500">Active</span>
+                <span v-if="isActiveTransport('webSerial')" class="ml-auto text-xs text-green-500"
+                  >Active</span
+                >
               </SidebarMenuButton>
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -154,7 +157,9 @@ function isActiveTransport(id: string): boolean {
             <SidebarMenuButton @click="disconnectWebSerial">
               <CableIcon />
               {{ $t('globals.disconnect') }} Serial
-              <span v-if="isActiveTransport('webSerial')" class="ml-auto text-xs text-green-500">Active</span>
+              <span v-if="isActiveTransport('webSerial')" class="ml-auto text-xs text-green-500"
+                >Active</span
+              >
             </SidebarMenuButton>
           </DropdownMenuItem>
           <template v-if="tauriSerial.isSupported">
@@ -163,7 +168,11 @@ function isActiveTransport(id: string): boolean {
                 <DropdownMenuSubTrigger :disabled="tauriSerialConnecting">
                   <CableIcon />
                   {{ $t('globals.connect') }} Native Serial
-                  <span v-if="isActiveTransport('tauriSerial')" class="ml-auto text-xs text-green-500">Active</span>
+                  <span
+                    v-if="isActiveTransport('tauriSerial')"
+                    class="ml-auto text-xs text-green-500"
+                    >Active</span
+                  >
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuItem v-if="tauriSerialPorts.length === 0" disabled>
@@ -184,7 +193,9 @@ function isActiveTransport(id: string): boolean {
               <SidebarMenuButton @click="disconnectTauriSerial">
                 <CableIcon />
                 {{ $t('globals.disconnect') }} Native Serial
-                <span v-if="isActiveTransport('tauriSerial')" class="ml-auto text-xs text-green-500">Active</span>
+                <span v-if="isActiveTransport('tauriSerial')" class="ml-auto text-xs text-green-500"
+                  >Active</span
+                >
               </SidebarMenuButton>
             </DropdownMenuItem>
           </template>
@@ -194,7 +205,11 @@ function isActiveTransport(id: string): boolean {
               <SidebarMenuButton @click="disconnectUdp">
                 <RadioIcon />
                 {{ $t('globals.disconnect') }} UDP Multicast
-                <span v-if="isActiveTransport('udpMulticast')" class="ml-auto text-xs text-green-500">Active</span>
+                <span
+                  v-if="isActiveTransport('udpMulticast')"
+                  class="ml-auto text-xs text-green-500"
+                  >Active</span
+                >
               </SidebarMenuButton>
             </DropdownMenuItem>
           </template>

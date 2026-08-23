@@ -19,7 +19,7 @@ interface UdpMulticastTarget {
   label: string;
 }
 
-export class UdpMulticastTransport implements DccTransport {
+export class UdpMulticastTransport implements DccTransport<'udpMulticast'> {
   readonly id = 'udpMulticast' as const;
   readonly isSupported = isUdpMulticastSupported;
   readonly connected = ref(false);
@@ -27,9 +27,14 @@ export class UdpMulticastTransport implements DccTransport {
 
   // The default value is `null`, so useStorage can't guess an object serializer from it (it
   // falls back to stringifying via String(), i.e. the literal text "[object Object]").
-  readonly lastTarget = useStorage<UdpMulticastTarget | null>('lastUdpMulticastTarget', null, undefined, {
-    serializer: StorageSerializers.object,
-  });
+  readonly lastTarget = useStorage<UdpMulticastTarget | null>(
+    'lastUdpMulticastTarget',
+    null,
+    undefined,
+    {
+      serializer: StorageSerializers.object,
+    },
+  );
 
   // Commands are sent unicast directly to the command station's own address, not to the
   // multicast group (which has no listener able to reply as a specific device).
@@ -42,8 +47,7 @@ export class UdpMulticastTransport implements DccTransport {
     this.dataHandler = fn;
   }
 
-  async connect(opts: TransportConnectOptions): Promise<boolean> {
-    if (opts.kind !== 'udpMulticast') return false;
+  async connect(opts: TransportConnectOptions<'udpMulticast'>): Promise<boolean> {
     this.connecting.value = true;
     try {
       const started = await startUdpMulticastListener(opts.group, opts.port, (data) => {
