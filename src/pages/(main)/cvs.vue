@@ -7,12 +7,14 @@ import CvTable from '@/cvs/cv-table/CvTable.vue';
 import CvCard from '@/cvs/CvCard.vue';
 import type { CvData } from '@/cvs/CvData';
 import { useCvStore } from '@/cvs/useCvStore';
+import { useCvActions } from '@/cvs/useCvActions';
 import { DownloadIcon, PlusIcon } from '@lucide/vue';
 import { computed, ref } from 'vue';
 
 const cvs = ref(new Set<number>([1, 8, 29, 5, 6]));
 
 const cvStore = useCvStore();
+const { readCv, refreshAll } = useCvActions();
 
 const cvAddressToAdd = ref<number>(1);
 
@@ -34,13 +36,11 @@ async function removeCv(address: number) {
 }
 
 async function refreshCv(address: number) {
-  await cvStore.readCv(address);
+  await readCv(address);
 }
 
 async function refreshAllCvs() {
-  for (const cv of sortedCvs.value) {
-    await cvStore.readCv(cv.address);
-  }
+  await refreshAll(sortedCvs.value.map((cv) => cv.address));
 }
 
 function downloadCsv() {

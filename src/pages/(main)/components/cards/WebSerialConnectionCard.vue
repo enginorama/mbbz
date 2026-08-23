@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useWebSerialTransport } from '@/connections/transports/serial/provideWebSerialTransport';
-import { ExWebSerial } from '@/connections/transports/serial/ExWebSerial';
+import { useConnectionManager } from '@/connections/ConnectionManager';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -9,8 +8,14 @@ import CardTitle from '@/core/components/ui/card/CardTitle.vue';
 import Spinner from '@/core/components/ui/spinner/Spinner.vue';
 import { CheckIcon, TriangleAlertIcon } from '@lucide/vue';
 
-const { connect, connected, connecting, disconnect } = useWebSerialTransport();
-const isWebSerialSupported = ExWebSerial.isSupported;
+const connectionManager = useConnectionManager();
+const webSerial = connectionManager.get('webSerial')!;
+
+const connect = () => void connectionManager.connect('webSerial', { kind: 'webSerial' });
+const disconnect = () => void connectionManager.disconnect('webSerial');
+const connected = webSerial.connected;
+const connecting = webSerial.connecting;
+const isWebSerialSupported = webSerial.isSupported;
 </script>
 
 <template>

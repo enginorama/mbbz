@@ -3,24 +3,31 @@ import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import { setupCabStateSync } from './cabs/state/setupCabStateSync';
 import { provideCommandStationStatusSync } from './commandstation/provideCommandStationStatusSync';
-import { setupDccInputBus } from './connections/ExConnection';
-import { provideTauriSerialTransport } from './connections/transports/serial/provideTauriSerialTransport';
-import { provideWebSerialTransport } from './connections/transports/serial/provideWebSerialTransport';
-import { provideUdpMulticastTransport } from './connections/transports/udpMulticast/provideUdpMulticastTransport';
-import { provideWebSocketTransport } from './connections/transports/websocket/useWebSocketTransport';
+import { provideCommandStation } from './commandstation/useCommandStation';
+import { provideConnectionManager } from './connections/ConnectionManager';
+import { TauriSerialTransport } from './connections/transports/serial/TauriSerialTransport';
+import { WebSerialTransport } from './connections/transports/serial/WebSerialTransport';
+import { UdpMulticastTransport } from './connections/transports/udpMulticast/UdpMulticastTransport';
+import { WebSocketTransport } from './connections/transports/websocket/WebSocketTransport';
 import SheetStack from './core/components/AppSheet/SheetStack.vue';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
 
-setupDccInputBus();
 setupCabStateSync();
 provideCommandStationStatusSync();
 
-const isAnyDialogOpen = ref(false);
+// Provide the orchestrator and the command-station client, then register the transport adapters.
+// Transports are pure I/O adapters; the ConnectionManager routes all commands through the single
+// active connection and decodes inbound data into DCC-EX packets.
+const connection = provideConnectionManager();
+connection.register(new WebSocketTransport());
+connection.register(new WebSerialTransport());
+connection.register(new TauriSerialTransport());
+connection.register(new UdpMulticastTransport());
+void connection.restore();
 
-provideWebSerialTransport();
-provideTauriSerialTransport();
-provideWebSocketTransport();
-provideUdpMulticastTransport();
+provideCommandStation();
+
+const isAnyDialogOpen = ref(false);
 
 import { onMounted } from 'vue';
 import { provideAppSheet } from './core/components/AppSheet/useAppSheet.ts';

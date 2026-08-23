@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useUdpMulticastTransport } from '@/connections/transports/udpMulticast/provideUdpMulticastTransport';
+import { useConnectionManager } from '@/connections/ConnectionManager';
+import { UdpMulticastTransport } from '@/connections/transports/udpMulticast/UdpMulticastTransport';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -22,13 +23,25 @@ import { computed, onUnmounted, ref } from 'vue';
 
 const websocketAddress = defineModel<string>('websocketAddress', { required: true });
 
-const {
-  connect: connectUdpMulticast,
-  disconnect: disconnectUdpMulticast,
-  connected: isUdpMulticastConnected,
-  connecting: isUdpMulticastConnecting,
-  lastTarget: lastUdpTarget,
-} = useUdpMulticastTransport();
+const connectionManager = useConnectionManager();
+const udp = connectionManager.get('udpMulticast')! as UdpMulticastTransport;
+const isUdpMulticastConnected = udp.connected;
+const isUdpMulticastConnecting = udp.connecting;
+const lastUdpTarget = udp.lastTarget;
+
+async function connectUdpMulticast(group: string, deviceAddress: string, port: number, label: string) {
+  await connectionManager.connect('udpMulticast', {
+    kind: 'udpMulticast',
+    group,
+    deviceAddress,
+    port,
+    label,
+  });
+}
+
+function disconnectUdpMulticast() {
+  return connectionManager.disconnect('udpMulticast');
+}
 
 const mdnsServices = ref<MdnsServiceInfo[]>([]);
 const isMdnsScanning = ref(false);

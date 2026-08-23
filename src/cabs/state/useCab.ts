@@ -1,30 +1,33 @@
-import { useExStationOutputBus } from '@/connections/ExEventBus';
+import { useConnectionManager } from '@/connections/ConnectionManager';
 import { toValue, type MaybeRefOrGetter } from 'vue';
 import { type CabDirection } from './CabState';
 import { useCabState } from './useCabState';
 
 export function useCab(dccAddress: MaybeRefOrGetter<number>) {
-  const { emit } = useExStationOutputBus();
-
+  const connectionManager = useConnectionManager();
   const cabState = useCabState(dccAddress);
 
+  function send(command: string) {
+    void connectionManager.send(command);
+  }
+
   function setSpeed(speed: number) {
-    emit(
+    send(
       `<t 0 ${toValue(dccAddress)} ${speed} ${cabState.value.direction === 'forward' ? '1' : '0'}>`,
     );
   }
 
   function toggleFunction(index: number) {
     const value = !cabState.value.functionStates[index];
-    emit(`<F ${toValue(dccAddress)} ${index} ${value ? '1' : '0'}>`);
+    send(`<F ${toValue(dccAddress)} ${index} ${value ? '1' : '0'}>`);
   }
 
   function setDirection(direction: CabDirection, speed: number) {
-    emit(`<t 0 ${toValue(dccAddress)} ${speed} ${direction === 'forward' ? '1' : '0'}>`);
+    send(`<t 0 ${toValue(dccAddress)} ${speed} ${direction === 'forward' ? '1' : '0'}>`);
   }
 
   function refresh() {
-    emit(`<t ${toValue(dccAddress)}>`);
+    send(`<t ${toValue(dccAddress)}>`);
   }
 
   return {

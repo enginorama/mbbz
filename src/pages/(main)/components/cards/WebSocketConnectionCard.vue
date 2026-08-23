@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWebSocketTransport } from '@/connections/transports/websocket/useWebSocketTransport';
+import { useConnectionManager } from '@/connections/ConnectionManager';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
 import CardContent from '@/core/components/ui/card/CardContent.vue';
@@ -13,15 +13,17 @@ import { TriangleAlertIcon } from '@lucide/vue';
 
 const websocketAddress = defineModel<string>('websocketAddress', { required: true });
 
-const {
-  connect: connectWebSocket,
-  disconnect: disconnectWebSocket,
-  isConnected: isWebSocketConnected,
-  isConnecting: isWebSocketConnecting,
-} = useWebSocketTransport();
+const connectionManager = useConnectionManager();
+const websocket = connectionManager.get('websocket')!;
+const isConnected = websocket.connected;
+const isConnecting = websocket.connecting;
 
 const connectWebSocketHandler = () => {
-  connectWebSocket(websocketAddress.value);
+  void connectionManager.connect('websocket', { kind: 'websocket', url: websocketAddress.value });
+};
+
+const disconnectWebSocket = () => {
+  void connectionManager.disconnect('websocket');
 };
 </script>
 
@@ -34,16 +36,16 @@ const connectWebSocketHandler = () => {
       <Input
         class="mb-4"
         v-model="websocketAddress"
-        :disabled="isWebSocketConnecting || isWebSocketConnected"
+        :disabled="isConnecting || isConnected"
       />
       <Button
         @click="connectWebSocketHandler"
-        v-if="!isWebSocketConnected"
-        :disabled="isWebSocketConnecting"
+        v-if="!isConnected"
+        :disabled="isConnecting"
       >
         Connect to WebSocket Server
       </Button>
-      <Button @click="disconnectWebSocket" v-if="isWebSocketConnected" variant="outline">
+      <Button @click="disconnectWebSocket" v-if="isConnected" variant="outline">
         Disconnect from WebSocket Server
       </Button>
       <Item>

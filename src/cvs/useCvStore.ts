@@ -1,4 +1,3 @@
-import { useCommandStation } from '@/commandstation/useCommandStation';
 import { defineStore } from 'pinia';
 import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue';
 
@@ -7,14 +6,19 @@ export type CvValue = {
   fetching: boolean;
 };
 
+/**
+ * Pure state store for CV values. It holds no dependencies on the command station — the actions
+ * that talk to the station live in `useCvActions`, keeping the store simple and testable.
+ */
 export const useCvStore = defineStore('cvs', () => {
-  const commandStation = useCommandStation();
   const cvValues = ref<Map<number, CvValue>>(new Map());
 
-  async function readCv(address: number) {
+  function setReading(address: number) {
     cvValues.value.set(address, { value: undefined, fetching: true });
-    const value = await commandStation.readCv(address);
-    cvValues.value.set(address, { value: value, fetching: false });
+  }
+
+  function setValue(address: number, value: number) {
+    cvValues.value.set(address, { value, fetching: false });
   }
 
   function clearCv(address: number) {
@@ -25,7 +29,7 @@ export const useCvStore = defineStore('cvs', () => {
     cvValues.value.clear();
   }
 
-  return { cvValues, readCv, clearCv, clear };
+  return { cvValues, setReading, setValue, clearCv, clear };
 });
 
 export function useCvValue(address: MaybeRefOrGetter<number>) {

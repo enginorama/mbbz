@@ -1,4 +1,5 @@
-import { useExNativeInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
+import { useExNativeInputBus } from '@/connections/ExEventBus';
+import type { ConnectionManager } from '@/connections/ConnectionManager';
 import type { DccExCommand } from '@/ex-native/ExNativeTokenizer';
 import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { Queue } from '@/lib/queue';
@@ -26,9 +27,10 @@ export type CsSensorValue = {
 };
 
 export class CommandStation {
-  private outputBus = useExStationOutputBus();
   private dccInputBus = useExNativeInputBus();
   private queue = new Queue(5);
+
+  constructor(private connectionManager: ConnectionManager) {}
 
   public async refreshRoster() {
     void this.queue.add(async () => {
@@ -291,6 +293,6 @@ export class CommandStation {
   }
 
   private sendCommand(command: string) {
-    this.outputBus.emit(command);
+    void this.connectionManager.send(command);
   }
 }

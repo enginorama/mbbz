@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCommandStation } from '@/commandstation/useCommandStation';
 import { useCommandStationStatusStore } from '@/commandstation/useCommandStationStatusStore';
-import { useExStationOutputBus } from '@/connections/ExEventBus';
+import { useConnectionManager } from '@/connections/ConnectionManager';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import Button from '@/core/components/ui/button/Button.vue';
 import Card from '@/core/components/ui/card/Card.vue';
@@ -14,8 +14,8 @@ import { computed } from 'vue';
 
 const commandStationStatusStore = useCommandStationStatusStore();
 const transportStatusStore = useTransportStatusStore();
-const outputBus = useExStationOutputBus();
 const commandStation = useCommandStation();
+const connectionManager = useConnectionManager();
 
 const powerInfo = computed<Array<{ track: string; mode?: TrackMode; on?: boolean }>>(() => {
   const trackNames = [
@@ -39,7 +39,7 @@ function togglePower(track: string): void {
   const currentPower = commandStationStatusStore.trackPowers[track];
   const newPowerState = !(currentPower?.on ?? false);
   const command = newPowerState ? `1 ${track}` : `0 ${track}`;
-  outputBus.emit(`<${command}>`);
+  void connectionManager.send(`<${command}>`);
 }
 
 function emergencyStop(): void {

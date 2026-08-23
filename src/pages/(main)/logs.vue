@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useExStationOutputBus } from '@/connections/ExEventBus';
+import { useConnectionManager } from '@/connections/ConnectionManager';
 import { useTransportStatusStore } from '@/connections/transports/useTransportStatusStore';
 import { useConnectionLogger } from '@/connections/useConnectionLogger';
 import PageLayout from '@/core/components/PageLayout.vue';
@@ -17,7 +17,7 @@ import {
 } from '@lucide/vue';
 import { nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 
-const outputBus = useExStationOutputBus();
+const connectionManager = useConnectionManager();
 
 const { logMessages } = useConnectionLogger();
 
@@ -35,7 +35,7 @@ function send() {
   if (messageToSend.value.trim() === '') {
     return;
   }
-  outputBus.emit(messageToSend.value.trim());
+  void connectionManager.send(messageToSend.value.trim());
   messageToSend.value = '';
 }
 

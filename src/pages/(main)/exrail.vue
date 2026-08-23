@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { useExNativeInputBus, useExStationOutputBus } from '@/connections/ExEventBus';
+import { useExNativeInputBus } from '@/connections/ExEventBus';
+import { useConnectionManager } from '@/connections/ConnectionManager';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import { MessageCircleQuestionIcon, PauseIcon, PlayIcon } from '@lucide/vue';
 import { onUnmounted, ref } from 'vue';
 
-const { emit } = useExStationOutputBus();
 const inputBus = useExNativeInputBus();
+const connectionManager = useConnectionManager();
 
 const messages = ref<string[]>([]);
 
@@ -25,15 +26,15 @@ onUnmounted(() => {
 });
 
 function pause(): void {
-  emit('</ PAUSE>');
+  void connectionManager.send('</ PAUSE>');
 }
 
 function resume(): void {
-  emit('</ RESUME>');
+  void connectionManager.send('</ RESUME>');
 }
 
 function requestStatus(): void {
-  emit('</>');
+  void connectionManager.send('</>');
 }
 </script>
 
