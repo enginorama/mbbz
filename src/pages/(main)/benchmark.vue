@@ -20,7 +20,7 @@ async function startTest(): Promise<void> {
     const start = performance.now();
     const ret = await cs.sendAndWaitForResponse({
       command: `<t 0 3 66 ${direction}>`,
-      callback: (response) => {
+      decode: (response) => {
         // DCC-EX also broadcasts <l> spontaneously (independent of any command we sent), so
         // without checking the cab, a stray broadcast for a different loco can get consumed by
         // the wrong iteration's wait here, starving a later iteration of its real response.
@@ -70,7 +70,7 @@ async function startSpeedRampTest(): Promise<void> {
   // all. Force it into a differing state first so every step in the ramp causes a real change.
   await cs.sendAndWaitForResponse({
     command: `<t 0 ${address} 1 ${direction === 1 ? 0 : 1}>`,
-    callback: (response) => {
+    decode: (response) => {
       if (response.command === 'l' && Number(response.params[0]) === address) return true;
     },
     defaultValue: false,
@@ -83,7 +83,7 @@ async function startSpeedRampTest(): Promise<void> {
     const start = performance.now();
     const result = await cs.sendAndWaitForResponse<SpeedResponse | null>({
       command: `<t 0 ${address} ${speed} ${direction}>`,
-      callback: (response) => {
+      decode: (response) => {
         if (response.command === 'l' && Number(response.params[0]) === address) {
           return decodeSpeedAndDir(Number(response.params[2]));
         }
@@ -103,7 +103,7 @@ async function startSpeedRampTest(): Promise<void> {
   }
   await cs.sendAndWaitForResponse({
     command: `<t 0 ${address} 0 ${direction}>`,
-    callback: (response) => {
+    decode: (response) => {
       if (response.command === 'l' && Number(response.params[0]) === address) return true;
     },
     defaultValue: false,

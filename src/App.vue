@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { RouterView } from 'vue-router';
 import { setupCabStateSync } from './cabs/state/setupCabStateSync';
+import { CommandStation } from './commandstation/CommandStation';
 import { provideCommandStationStatusSync } from './commandstation/provideCommandStationStatusSync';
 import { provideCommandStation } from './commandstation/useCommandStation';
 import { provideConnectionManager } from './connections/ConnectionManager';
@@ -12,24 +13,27 @@ import { WebSocketTransport } from './connections/transports/websocket/WebSocket
 import SheetStack from './core/components/AppSheet/SheetStack.vue';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
 
-setupCabStateSync();
-provideCommandStationStatusSync();
-
 // Provide the orchestrator and the command-station client, then register the transport adapters.
-// Transports are pure I/O adapters; the ConnectionManager routes all commands through the single
-// active connection and decodes inbound data into DCC-EX packets.
+// Transports are pure I/O adapters; the CommandStation decodes and dispatches DCC-EX packets.
 const connection = provideConnectionManager();
+const commandStation = provideCommandStation(new CommandStation(connection));
+
+const stopCabStateSync = setupCabStateSync(commandStation);
+const stopCommandStationStatusSync = provideCommandStationStatusSync(commandStation);
+
+onUnmounted(() => {
+  stopCabStateSync();
+  stopCommandStationStatusSync();
+});
+
 connection.register(new WebSocketTransport());
 connection.register(new WebSerialTransport());
 connection.register(new TauriSerialTransport());
 connection.register(new UdpMulticastTransport());
 void connection.restore();
 
-provideCommandStation();
-
 const isAnyDialogOpen = ref(false);
 
-import { onMounted } from 'vue';
 import { provideAppSheet } from './core/components/AppSheet/useAppSheet.ts';
 
 const { stack, remove } = provideAppSheet();

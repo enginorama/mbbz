@@ -1,13 +1,12 @@
-import { useExNativeInputBus } from '@/connections/ExEventBus';
+import type { CommandStation } from '@/commandstation/CommandStation';
 import type { DccExCommand } from '@/ex-native/ExNativeTokenizer';
 import { NUM_CAB_FUNCTIONS, type CabDirection } from './CabState';
 import { useCabStatesStore } from './useCabStatesStore';
 
-export function setupCabStateSync() {
+export function setupCabStateSync(commandStation: CommandStation) {
   const cabStates = useCabStatesStore();
-  const exNativeInputBus = useExNativeInputBus();
 
-  exNativeInputBus.on((command) => {
+  return commandStation.onCommand('l', (command) => {
     analyseCommand(command);
   });
 

@@ -1,51 +1,33 @@
-import { useExNativeInputBus } from '@/connections/ExEventBus';
-import { parseCommandStationInfo } from '@/ex-native/parsers/parseCommandStationInfo';
-import { parseNumMaxSupportedCabs } from '@/ex-native/parsers/parseNumMaxSupportedCabs';
-import { parsePauseStatus } from '@/ex-native/parsers/parsePauseStatus';
-import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
-import { parseTrackConfiguration } from '@/ex-native/parsers/parseTrackConfiguration';
-import { parseTrackPower } from '@/ex-native/parsers/parseTrackPower';
+import { parseCommand } from '@/ex-native/parsers/parseCommand';
+import type { CommandStation } from './CommandStation';
 import { useCommandStationStatusStore } from './useCommandStationStatusStore';
 
-export function provideCommandStationStatusSync() {
-  const exNativeInputBus = useExNativeInputBus();
+export function provideCommandStationStatusSync(commandStation: CommandStation) {
   const commandStationStatusStore = useCommandStationStatusStore();
 
-  exNativeInputBus.on((command) => {
-    const commandStationInfo = parseCommandStationInfo(command);
-    if (commandStationInfo) {
-      commandStationStatusStore.setInfo(commandStationInfo);
-      return;
-    }
+  return commandStation.onPacket((command) => {
+    const result = parseCommand(command);
+    if (!result) return;
 
-    const sensorStatus = parseSensorStatus(command);
-    if (sensorStatus) {
-      commandStationStatusStore.setSensorStatus(sensorStatus);
-      return;
-    }
-
-    const trackConfiguration = parseTrackConfiguration(command);
-    if (trackConfiguration) {
-      commandStationStatusStore.setTrackConfiguration(trackConfiguration);
-      return;
-    }
-
-    const trackPower = parseTrackPower(command);
-    if (trackPower) {
-      commandStationStatusStore.setTrackPower(trackPower);
-      return;
-    }
-
-    const numMaxSupportedCabs = parseNumMaxSupportedCabs(command);
-    if (numMaxSupportedCabs !== undefined) {
-      commandStationStatusStore.setNumMaxSupportedCabs(numMaxSupportedCabs);
-      return;
-    }
-
-    const isPaused = parsePauseStatus(command);
-    if (isPaused !== undefined) {
-      commandStationStatusStore.setIsPaused(isPaused);
-      return;
+    switch (result.type) {
+      case 'commandStationInfo':
+        commandStationStatusStore.setInfo(result.data);
+        break;
+      case 'sensorStatus':
+        commandStationStatusStore.setSensorStatus(result.data);
+        break;
+      case 'trackConfiguration':
+        commandStationStatusStore.setTrackConfiguration(result.data);
+        break;
+      case 'trackPower':
+        commandStationStatusStore.setTrackPower(result.data);
+        break;
+      case 'numMaxSupportedCabs':
+        commandStationStatusStore.setNumMaxSupportedCabs(result.data);
+        break;
+      case 'pauseStatus':
+        commandStationStatusStore.setIsPaused(result.data);
+        break;
     }
   });
 }

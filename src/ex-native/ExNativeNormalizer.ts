@@ -4,6 +4,11 @@ export class ExNativeNormalizer {
 
   constructor(private callback: (command: string) => void = () => {}) {}
 
+  public reset(): void {
+    this.state = 'waiting_for_start';
+    this.currentCommandBuffer = '';
+  }
+
   public parseChunk(data: string, callback: (command: string) => void = this.callback) {
     for (const char of data) {
       if (char === '<') {

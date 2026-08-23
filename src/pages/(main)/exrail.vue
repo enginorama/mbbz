@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { useExNativeInputBus } from '@/connections/ExEventBus';
+import { useCommandStation } from '@/commandstation/useCommandStation';
 import { useConnectionManager } from '@/connections/ConnectionManager';
 import PageLayout from '@/core/components/PageLayout.vue';
 import Button from '@/core/components/ui/button/Button.vue';
 import { MessageCircleQuestionIcon, PauseIcon, PlayIcon } from '@lucide/vue';
 import { onUnmounted, ref } from 'vue';
 
-const inputBus = useExNativeInputBus();
+const commandStation = useCommandStation();
 const connectionManager = useConnectionManager();
 
 const messages = ref<string[]>([]);
 
-const stopListening = inputBus.on((packet) => {
-  if (packet.command === '*') {
-    const [subCommand, ...params] = packet.params;
-    if (subCommand === 'EXRAIL') {
-      messages.value = [...messages.value.slice(-299), `${params.join(' ')}`];
-      console.log('Received status update:', params);
-    }
+const stopListening = commandStation.onCommand('*', (packet) => {
+  const [subCommand, ...params] = packet.params;
+  if (subCommand === 'EXRAIL') {
+    messages.value = [...messages.value.slice(-299), `${params.join(' ')}`];
+    console.log('Received status update:', params);
   }
 });
 

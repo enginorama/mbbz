@@ -1,7 +1,4 @@
 import { inject, provide, ref, type InjectionKey, type Ref } from 'vue';
-import { useExNativeInputBus } from '@/connections/ExEventBus';
-import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
-import { tokenizeExNativeString } from '@/ex-native/ExNativeTokenizer';
 import type { DccTransport, TransportConnectOptions, TransportId, TransportMap } from './types';
 
 /**
@@ -11,33 +8,30 @@ import type { DccTransport, TransportConnectOptions, TransportId, TransportMap }
  * - `connect(id, opts)` makes `id` the active connection (disconnecting any previous one), so
  *   only a single connection is ever open.
  * - `send(data)` writes to the active transport only — the outbound command string bus is gone.
- * - inbound data from the active transport is fed through a single streaming decoder that
- *   tokenizes the DCC-EX protocol and emits parsed packets on the domain packet bus.
+ * - inbound data is forwarded to the registered handler without interpreting its protocol.
  */
 export class ConnectionManager {
   private transports = new Map<TransportId, DccTransport>();
   private activeId = ref<TransportId | null>(null);
+  private dataHandler: (data: string) => void = () => {};
+  private dataResetHandler: () => void = () => {};
 
-  private packetBus = useExNativeInputBus();
-
-  // One streaming decoder shared by all transports (serial streams arrive in chunks; WebSocket
-  // frames may split commands), so every transport is decoded the same way.
-  private normalizer = new ExNativeNormalizer((line) => {
-    const packets = tokenizeExNativeString(line);
-    for (const packet of packets) {
-      this.packetBus.emit(packet);
-    }
-  });
-
-  /** Registers a transport and wires its inbound data into the shared decoder. */
+  /** Registers a transport and wires its inbound data into the shared handler. */
   register<Id extends TransportId>(transport: TransportMap[Id] & DccTransport<Id>) {
     this.transports.set(transport.id, transport);
-    transport.setDataHandler((data) => this.normalizer.parseChunk(data));
+    transport.setDataHandler((data) => this.dataHandler(data));
+  }
+
+  /** Assigns the protocol layer that consumes raw data and resets it between transport streams. */
+  setDataHandler(handler: (data: string) => void, resetHandler: () => void = () => {}): void {
+    this.dataHandler = handler;
+    this.dataResetHandler = resetHandler;
   }
 
   unregister(id: TransportId) {
     this.transports.delete(id);
     if (this.activeId.value === id) {
+      this.dataResetHandler();
       this.activeId.value = null;
     }
   }
@@ -78,6 +72,7 @@ export class ConnectionManager {
     if (previous && previous.id !== id) {
       await previous.disconnect();
     }
+    this.dataResetHandler();
     const ok = await transport.connect(opts);
     if (ok && transport.connected.value) {
       this.activeId.value = id;
@@ -88,8 +83,10 @@ export class ConnectionManager {
   async disconnect(id?: TransportId): Promise<void> {
     const target = id ? this.getTransport(id) : this.active;
     if (!target) return;
+    const wasActive = this.activeId.value === target.id;
     await target.disconnect();
-    if (this.activeId.value === target.id) {
+    if (wasActive) {
+      this.dataResetHandler();
       this.activeId.value = null;
     }
   }

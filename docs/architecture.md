@@ -65,7 +65,13 @@ duplicated/overlapping (`parseSensorStatus` matches `Q`/`q` 1 param; `getSensorL
 3 params; `parseTrackPower` matches `p1`/`p0`). Two subsystems content-match the same global
 input bus. No command registry/dispatcher.
 
-**Status:** [ ] open
+**Status:** [x] done — decoding is now centralized. A `parseCommand` dispatcher (parser list +
+discriminated `ParsedCommandResult` union) replaces the linear if/else chain in
+`provideCommandStationStatusSync`, fixing the `0`/`false` truthiness bug. The `CommandStation`
+correlation matchers were extracted into shared decoders (`parseCommandResponses.ts` —
+`parseRosterAddressList`, `parseRosterEntry`, `parseTurnoutIdList`, `parseTurnoutEntry`,
+`parseCvValue`, `parseSensorDefinition`), so the `Q` value (1-param) vs `Q` list (3-param)
+collision now has two distinct named decoders instead of two ad-hoc matchers in separate places.
 
 ### 6. Inconsistent state architecture
 

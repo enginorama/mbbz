@@ -1,36 +1,79 @@
-import { useExNativeInputBus } from '@/connections/ExEventBus';
 import type { ConnectionManager } from '@/connections/ConnectionManager';
-import type { DccExCommand } from '@/ex-native/ExNativeTokenizer';
+import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
+import { tokenizeExNativeString, type DccExCommand } from '@/ex-native/ExNativeTokenizer';
+import {
+  parseCvValue,
+  parseRosterAddressList,
+  parseRosterEntry,
+  parseSensorDefinition,
+  parseTurnoutEntry,
+  parseTurnoutIdList,
+} from '@/ex-native/parsers/parseCommandResponses';
+import type {
+  CsSensorInfo,
+  CsSensorValue,
+  RosterEntry,
+  TurnoutEntry,
+} from '@/ex-native/parsers/parseCommandResponses';
 import { parseSensorStatus } from '@/ex-native/parsers/parseSensorStatus';
 import { Queue } from '@/lib/queue';
 
-export interface RosterEntry {
-  address: number;
-  name: string;
-}
+export type {
+  CsSensorInfo,
+  CsSensorValue,
+  RosterEntry,
+  TurnoutEntry,
+} from '@/ex-native/parsers/parseCommandResponses';
 
-export interface TurnoutEntry {
-  id: number;
-  name: string;
-  status: string;
-}
-
-export type CsSensorInfo = {
-  id: number;
-  vPin?: number;
-  pullUp?: boolean;
-};
-
-export type CsSensorValue = {
-  id: number;
-  value: boolean;
-};
+type PacketListener = (packet: DccExCommand) => void;
 
 export class CommandStation {
-  private dccInputBus = useExNativeInputBus();
   private queue = new Queue(5);
+  private packetListeners = new Set<PacketListener>();
+  private commandListeners = new Map<string, Set<PacketListener>>();
+  private normalizer: ExNativeNormalizer;
 
-  constructor(private connectionManager: ConnectionManager) {}
+  constructor(private connectionManager: ConnectionManager) {
+    this.normalizer = new ExNativeNormalizer((line) => {
+      for (const packet of tokenizeExNativeString(line)) {
+        this.dispatchPacket(packet);
+      }
+    });
+    this.connectionManager.setDataHandler(
+      (data) => this.normalizer.parseChunk(data),
+      () => this.normalizer.reset(),
+    );
+  }
+
+  public onPacket(listener: PacketListener): () => void {
+    this.packetListeners.add(listener);
+    return () => this.packetListeners.delete(listener);
+  }
+
+  public onCommand(command: string, listener: PacketListener): () => void {
+    const listeners = this.commandListeners.get(command) ?? new Set<PacketListener>();
+    listeners.add(listener);
+    this.commandListeners.set(command, listeners);
+
+    return () => {
+      listeners.delete(listener);
+      if (listeners.size === 0) {
+        this.commandListeners.delete(command);
+      }
+    };
+  }
+
+  private dispatchPacket(packet: DccExCommand): void {
+    const packetListeners = [...this.packetListeners];
+    const commandListeners = [...(this.commandListeners.get(packet.command) ?? [])];
+
+    for (const listener of packetListeners) {
+      listener(packet);
+    }
+    for (const listener of commandListeners) {
+      listener(packet);
+    }
+  }
 
   public refreshRoster() {
     void this.queue.add(async () => {
@@ -53,12 +96,7 @@ export class CommandStation {
   public async getRosterAddresses(): Promise<number[]> {
     return this.sendAndWaitForResponse<number[]>({
       command: '<JR>',
-      callback: (packet) => {
-        if (packet.command === 'jR' && !packet.params[1]?.startsWith(`"`)) {
-          return packet.params.map((param) => Number(param));
-        }
-        return undefined;
-      },
+      decode: parseRosterAddressList,
       defaultValue: [],
     });
   }
@@ -66,16 +104,9 @@ export class CommandStation {
   public async getRosterEntry(address: number): Promise<RosterEntry | null> {
     return this.sendAndWaitForResponse<RosterEntry | null>({
       command: `<JR ${address}>`,
-      callback: (packet) => {
-        if (
-          packet.command === 'jR' &&
-          Number(packet.params[0]) === address &&
-          packet.params[1]?.startsWith(`"`)
-        ) {
-          const name = packet.params[1].substring(1, packet.params[1].length - 1);
-          return { address: address, name: name };
-        }
-        return undefined;
+      decode: (packet) => {
+        const entry = parseRosterEntry(packet);
+        return entry && entry.address === address ? entry : undefined;
       },
       defaultValue: null,
     });
@@ -96,12 +127,7 @@ export class CommandStation {
   public async getTurnoutIds(): Promise<number[]> {
     return this.sendAndWaitForResponse<number[]>({
       command: '<JT>',
-      callback: (packet) => {
-        if (packet.command === 'jT' && !packet.params[2]?.startsWith(`"`)) {
-          return packet.params.map((param) => Number(param));
-        }
-        return undefined;
-      },
+      decode: parseTurnoutIdList,
       defaultValue: [],
     });
   }
@@ -109,15 +135,9 @@ export class CommandStation {
   public async getTurnoutEntry(id: number): Promise<TurnoutEntry | null> {
     return this.sendAndWaitForResponse<TurnoutEntry | null>({
       command: `<JT ${id}>`,
-      callback: (packet) => {
-        if (packet.command === 'jT' && packet.params[2]?.startsWith(`"`)) {
-          return {
-            id: Number(packet.params[0]),
-            name: packet.params[2].substring(1, packet.params[2].length - 1) ?? '',
-            status: packet.params[1] ?? '',
-          };
-        }
-        return undefined;
+      decode: (packet) => {
+        const entry = parseTurnoutEntry(packet);
+        return entry && entry.id === id ? entry : undefined;
       },
       defaultValue: null,
     });
@@ -126,11 +146,9 @@ export class CommandStation {
   public async readCv(address: number): Promise<number> {
     return this.sendAndWaitForResponse<number>({
       command: `<R ${address}>`,
-      callback: (packet) => {
-        if (packet.command === 'v' && Number(packet.params[0]) === address) {
-          return Number(packet.params[1] ?? -1);
-        }
-        return undefined;
+      decode: (packet) => {
+        const cv = parseCvValue(packet);
+        return cv && cv.address === address ? cv.value : undefined;
       },
       defaultValue: -1,
     });
@@ -139,26 +157,14 @@ export class CommandStation {
   public async getSensorList(): Promise<Array<CsSensorInfo>> {
     return this.sendAndCollectResponses<CsSensorInfo>({
       command: '<S>',
-      callback: (packet) => {
-        if (packet.command === 'Q' && packet.params.length === 3) {
-          const sensorId = +packet.params[0];
-          const sensorVPin = +packet.params[1];
-          const sensorPullUp = packet.params[2] === '1';
-          return {
-            id: sensorId,
-            vPin: sensorVPin,
-            pullUp: sensorPullUp,
-          };
-        }
-        return undefined;
-      },
+      decode: parseSensorDefinition,
     });
   }
 
   public async getSensorValues(): Promise<Array<CsSensorValue>> {
     return this.sendAndCollectResponses<CsSensorValue>({
       command: '<Q>',
-      callback: parseSensorStatus,
+      decode: parseSensorStatus,
     });
   }
 
@@ -217,21 +223,23 @@ export class CommandStation {
   }
 
   /**
-   * Sends a command and waits until the callback returns a non-undefined value or the timeout is reached.
+   * Sends a command and waits until `decode` returns a non-undefined value or the timeout is
+   * reached. The decode function must return `undefined` for every packet that is not the reply
+   * being awaited.
    */
   public async sendAndWaitForResponse<T>({
     command,
-    callback,
+    decode,
     defaultValue,
   }: {
     command: string;
-    callback: (command: DccExCommand) => T | undefined | null;
+    decode: (command: DccExCommand) => T | undefined | null;
     defaultValue: T;
   }): Promise<T> {
     return this.queue.add(async () => {
       const fetchedValue = await new Promise<T>((resolve, reject) => {
-        const off = this.dccInputBus.on((packet) => {
-          const value = callback(packet);
+        const off = this.onPacket((packet) => {
+          const value = decode(packet);
           if (value != null) {
             off();
             resolve(value);
@@ -252,15 +260,15 @@ export class CommandStation {
   }
 
   /**
-   * Sends a command and collects all responses until the callback only returns undefined values
-   * for a certain period of time.
+   * Sends a command and collects every packet `decode` accepts until it stops returning values for
+   * a while.
    */
   private async sendAndCollectResponses<T>({
     command,
-    callback,
+    decode,
   }: {
     command: string;
-    callback: (command: DccExCommand) => T | undefined | null;
+    decode: (command: DccExCommand) => T | undefined | null;
   }): Promise<Array<T>> {
     return this.queue.add(async () => {
       const fetchedValues: Array<T> = [];
@@ -275,8 +283,8 @@ export class CommandStation {
           }, 200);
         };
 
-        const off = this.dccInputBus.on((packet) => {
-          const value = callback(packet);
+        const off = this.onPacket((packet) => {
+          const value = decode(packet);
           if (value != null) {
             fetchedValues.push(value);
             resetTimeout();
