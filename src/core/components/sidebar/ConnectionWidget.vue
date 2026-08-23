@@ -21,6 +21,7 @@ import {
 } from '@/core/components/ui/sidebar';
 import { CableIcon, ChevronsUpDown, RadioIcon, UnplugIcon } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import type { TransportId } from '@/connections/types';
 
 const { isMobile } = useSidebar();
 
@@ -99,7 +100,7 @@ function disconnectUdp() {
   void manager.disconnect('udpMulticast');
 }
 
-function isActiveTransport(id: string): boolean {
+function isActiveTransport(id: TransportId): boolean {
   return manager.activeTransportId.value === id;
 }
 </script>

@@ -32,7 +32,7 @@ export class CommandStation {
 
   constructor(private connectionManager: ConnectionManager) {}
 
-  public async refreshRoster() {
+  public refreshRoster() {
     void this.queue.add(async () => {
       this.sendCommand('<JR>');
     });
@@ -207,9 +207,7 @@ export class CommandStation {
   }
 
   public sendResumeCabs() {
-    return this.queue.add(async () => {
-      this.sendCommand('<!R>');
-    });
+    this.sendCommand('<!R>');
   }
 
   public requestPauseStatus(): Promise<void> {
@@ -292,6 +290,12 @@ export class CommandStation {
     });
   }
 
+  /**
+   * Immediate write for control commands that need no reply and must never be queued (throttle,
+   * emergency stop, pause/resume). Commands that elicit a reply from the station — even if we only
+   * refresh and don't await — are wrapped in the queue (see `refreshRoster` etc.) so the station
+   * isn't flooded and responses stay ordered.
+   */
   private sendCommand(command: string) {
     void this.connectionManager.send(command);
   }

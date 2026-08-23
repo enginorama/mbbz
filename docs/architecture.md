@@ -39,7 +39,13 @@ via `sendAndWaitForResponse`. Other callers bypass the queue and `outputBus.emit
 `CommandStationInfoCard.vue:42`, `logs.vue:38`, `exrail.vue`. A direct emit interleaving with a
 queued query can corrupt correlation and cause spurious timeouts.
 
-**Status:** [ ] open
+**Status:** [x] done — two outbound paths. **Queued**: every command that makes the station reply
+(`<JR>/<JT>/<R>` reads, `<S>/<Q>` sensor list/values, `<JG>/<JI>` current, `<!Q>` pause-status,
+`sendAndWaitForResponse`, `sendAndCollectResponses`) — even though some are only *refreshes* and
+aren't awaited, they still elicit data and must stay serialized so responses stay ordered and the
+station isn't flooded. **Immediate**: pure control with no reply (throttle via `useCab`, emergency
+stop, pause/resume), which must never be blocked behind a slow correlated read. Correlation stays
+safe because queued waits match on distinct packet content.
 
 ### 4. Two divergent parsing pipelines
 

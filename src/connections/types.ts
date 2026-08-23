@@ -32,6 +32,21 @@ export type TransportId = keyof TransportMap & keyof TransportConnectOptionsMap;
 export type TransportConnectOptions<Id extends TransportId = TransportId> =
   TransportConnectOptionsMap[Id];
 
+/** True when two types share the same `keyof` set, false otherwise. */
+type _KeysEqual<A, B> = Exclude<keyof A, keyof B> extends never
+  ? Exclude<keyof B, keyof A> extends never
+    ? true
+    : false
+  : false;
+
+/** Requires a type to extend `true`, erroring on anything else (e.g. `false`). */
+type _ExpectTrue<T extends true> = T;
+
+// Compile-time guard: `TransportMap` and `TransportConnectOptionsMap` must always declare the
+// same set of transport ids. `TransportId` is the intersection of the two `keyof`s, so an id
+// missing from either map would silently vanish from the union; this forces a build error instead.
+type _assertTransportMapKeysMatch = _ExpectTrue<_KeysEqual<TransportMap, TransportConnectOptionsMap>>;
+
 /**
  * A transport is a pure I/O adapter for one way of reaching the command station. It knows
  * nothing about the rest of the app: no event bus, no notion of "active". It simply exposes its

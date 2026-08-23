@@ -50,6 +50,14 @@ export class ConnectionManager {
     return transport as TransportMap[Id];
   }
 
+  /**
+   * Looks up a transport by id, narrowed to the matching `DccTransport<Id>`. The cast is sound
+   * because `register` always stores a transport under its own `id`.
+   */
+  private getTransport<Id extends TransportId>(id: Id): DccTransport<Id> | undefined {
+    return this.transports.get(id) as DccTransport<Id> | undefined;
+  }
+
   get activeTransportId(): Readonly<Ref<TransportId | null>> {
     return this.activeId;
   }
@@ -64,7 +72,7 @@ export class ConnectionManager {
     id: Id,
     opts: TransportConnectOptions<Id>,
   ): Promise<boolean> {
-    const transport = this.transports.get(id) as DccTransport<Id> | undefined;
+    const transport = this.getTransport(id);
     if (!transport) return false;
     const previous = this.active;
     if (previous && previous.id !== id) {
@@ -78,7 +86,7 @@ export class ConnectionManager {
   }
 
   async disconnect(id?: TransportId): Promise<void> {
-    const target = id ? this.transports.get(id) : this.active;
+    const target = id ? this.getTransport(id) : this.active;
     if (!target) return;
     await target.disconnect();
     if (this.activeId.value === target.id) {
