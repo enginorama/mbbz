@@ -25,7 +25,8 @@ The entire data path hangs off two module-scope global event buses
 provided/injected, not tied to a connection, and talks to global buses.
 
 - ~~Cannot be mocked in tests.~~ Now injectable via `provideCommandStation`/`useCommandStation`.
-- Now wired to the provided `ConnectionManager` via its constructor.
+- Now decoupled from the transport layer — it takes the raw `ConnectionIo` surface via its
+  constructor.
 - Duplicate `RosterEntry` types: `CommandStation.getRosterEntries()` returns `{address,name}`,
   `useRosterStore` defines a different `{address,name,functionMap}` and is never populated.
 
@@ -55,8 +56,8 @@ safe because queued waits match on distinct packet content.
 - `sendAndWaitForResponse` subscribes to the tokenized packet bus; the WebSocket path tokenizes
   per-frame — inconsistent boundary between transports.
 
-**Status:** [x] done — all transports now feed one shared decoder (normalizer + tokenizer) in
-`ConnectionManager`, so streaming/WebSocket input is decoded identically.
+**Status:** [x] done — all transports now feed one shared decoder (normalizer + tokenizer) owned by
+the `CommandStation`, so streaming/WebSocket input is decoded identically regardless of transport.
 
 ### 5. Parser dispatch is a linear if-else with overlapping matching
 
@@ -82,10 +83,11 @@ State is spread across four mechanisms with no clear layering:
 3. Pinia stores (`transportStatus`, `cabStates`, `commandStationStatus`, `roster`).
 4. ~~provide/inject for transports.~~
 
-- Note: `ConnectionManager` and `CommandStation` are provided/injected. `useCvStore` no longer
-  depends on the station — its actions moved to the `useCvActions` composable, so the inject
-  problem (calling `useCommandStation()` from a Pinia store) is gone and no fallback hack is
-  needed. `useConnectionLogger` remains a module singleton.
+- Note: `ConnectionManager` and `CommandStation` are provided/injected and decoupled via the raw
+  `ConnectionIo` surface (`send`/`onData`/`onReset`). `useCvStore` no longer depends on the station
+  — its actions moved to the `useCvActions` composable. The global packet bus is gone entirely;
+  `CommandStation` owns decoding + dispatch (`onPacket`/`onCommand`). `useConnectionLogger` remains
+  a module singleton.
 
 **Status:** [ ] open
 
@@ -129,28 +131,34 @@ on the custom `tauri://` protocol.
 
 ## Done
 
+### CommandStation owns the protocol layer (`CommandStation.ts`)
+
+- `CommandStation` now owns decoding and packet dispatch. Its constructor builds the shared
+  `ExNativeNormalizer` + tokenizer over the raw `ConnectionIo` surface (`onData`/`onReset`) and
+  exposes `onPacket(listener)` (all packets) and `onCommand(cmd, listener)` (scoped).
+- `setupCabStateSync` and `provideCommandStationStatusSync` subscribe through it; both return
+  unsubscribes wired into `App.vue`'s `onUnmounted`.
+- Correlation matchers use the shared decoders (`parseCommandResponses.ts`).
+
+### ConnectionIo decoupling
+
+- `ConnectionManager` is now purely transport orchestration: single active connection,
+  `connect(id)` disconnects any previous one, `send` writes to the active transport. It exposes a
+  raw `ConnectionIo` (`send`/`onData`/`onReset`) and returns `{ manager, io }` from
+  `provideConnectionManager`.
+- `CommandStation` depends only on `ConnectionIo` — it never touches the transport layer.
+- `provideCommandStation(station)` takes a pre-built instance (no default), keeping the provider
+  free of connection-layer coupling.
+
 ### A1 — active-connection routing
 
-**Replaced by a proper orchestrator (below).** The `useConnectionStore` gate was deleted and
-transports became pure `DccTransport` adapters registered with a central `ConnectionManager`.
+Transports are pure `DccTransport` adapters (`types.ts`) registered with a central
+`ConnectionManager`; only one connection is ever active/open. The old global event buses are gone
+(`ExEventBus` deleted). `TransportId` (in `types.ts`) also lays groundwork for item 7 —
+`useTransportStatusStore` still uses magic strings.
 
-### ConnectionManager orchestrator (`ConnectionManager.ts`)
+### Packet dispatch & dispatch robustness
 
-- Transports are pure `DccTransport` adapters (`types.ts`): `connected`/`connecting` refs,
-  `connect`/`disconnect`/`send`, and a `setDataHandler` the manager assigns. They know nothing
-  about the app, the buses, or what "active" means.
-- `ConnectionManager` owns the single active connection: `connect(id)` disconnects any previous
-  one, `send(data)` writes to the active transport, `disconnect(id?)` tears it down.
-- `ExEventBus` no longer has raw string input/output buses; only the parsed-packet bus remains.
-  Commands go `CommandStation.sendCommand → connectionManager.send → active.send`.
-- All four transports now share **one decoder** (normalizer + tokenizer) inside the manager, so
-  inbound data is decoded the same way regardless of transport — item 4's divergent pipelines are
-  unified.
-
-**Decision: exactly one connection at a time.** DCC-EX expects a single controlling client, so
-multiple half-open transports are misleading; connecting a different transport *is* the way to
-switch. `ConnectionWidget` shows which transport is active.
-
-Effect: exactly one transport drives the pipeline at a time; outbound commands can no longer be
-written to multiple transports, and only one transport is ever left open. `TransportId` (in
-`types.ts`) also lays groundwork for item 7 — `useTransportStatusStore` still uses magic strings.
+- `dispatchPacket` snapshots listener sets before iterating, so listener add/remove during
+  dispatch only affects the next packet (tested).
+- The `ExNativeNormalizer` buffer is reset on transport connect/disconnect/switch (tested).

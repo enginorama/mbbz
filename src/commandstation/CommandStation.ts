@@ -1,4 +1,4 @@
-import type { ConnectionManager } from '@/connections/ConnectionManager';
+import type { ConnectionIo } from '@/connections/ConnectionManager';
 import { ExNativeNormalizer } from '@/ex-native/ExNativeNormalizer';
 import { tokenizeExNativeString, type DccExCommand } from '@/ex-native/ExNativeTokenizer';
 import {
@@ -33,16 +33,14 @@ export class CommandStation {
   private commandListeners = new Map<string, Set<PacketListener>>();
   private normalizer: ExNativeNormalizer;
 
-  constructor(private connectionManager: ConnectionManager) {
+  constructor(private io: ConnectionIo) {
     this.normalizer = new ExNativeNormalizer((line) => {
       for (const packet of tokenizeExNativeString(line)) {
         this.dispatchPacket(packet);
       }
     });
-    this.connectionManager.setDataHandler(
-      (data) => this.normalizer.parseChunk(data),
-      () => this.normalizer.reset(),
-    );
+    this.io.onData((data) => this.normalizer.parseChunk(data));
+    this.io.onReset(() => this.normalizer.reset());
   }
 
   public onPacket(listener: PacketListener): () => void {
@@ -305,6 +303,6 @@ export class CommandStation {
    * isn't flooded and responses stay ordered.
    */
   private sendCommand(command: string) {
-    void this.connectionManager.send(command);
+    void this.io.send(command);
   }
 }

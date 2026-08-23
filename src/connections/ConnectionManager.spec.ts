@@ -23,7 +23,8 @@ describe('ConnectionManager stream lifecycle', () => {
     } as unknown as WebSocketTransport;
     const manager = new ConnectionManager();
     const resetData = vi.fn<() => void>();
-    manager.setDataHandler(vi.fn<(data: string) => void>(), resetData);
+    manager.io.onData(vi.fn<(data: string) => void>());
+    manager.io.onReset(resetData);
     manager.register(transport);
 
     await manager.connect('websocket', { kind: 'websocket', url: 'ws://command-station' });

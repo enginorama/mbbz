@@ -37,32 +37,57 @@ watch(address, () => {
     </PageMenuBar>
     <Item variant="outline" class="flex flex-col">
       <div class="flex items-center justify-center">
-        <Slider :min-label="'Stop'" :min="0" :max="126" :step="1" orientation="vertical"
-          class="mx-8 data-[orientation=vertical]:h-55" :model-value="[cab.state.value.speed]"
-          @update:model-value="updateSpeed" />
+        <Slider
+          :min-label="'Stop'"
+          :min="0"
+          :max="126"
+          :step="1"
+          orientation="vertical"
+          class="mx-8 data-[orientation=vertical]:h-55"
+          :model-value="[cab.state.value.speed]"
+          @update:model-value="updateSpeed"
+        />
         <div class="grid grid-cols-7 gap-2">
-          <Button v-for="i in NUM_CAB_FUNCTIONS" :key="i" @click="cab.toggleFunction(i - 1)"
-            :variant="cab.state.value.functionStates[i - 1] ? 'default' : 'outline'">
+          <Button
+            v-for="i in NUM_CAB_FUNCTIONS"
+            :key="i"
+            @click="cab.toggleFunction(i - 1)"
+            :variant="cab.state.value.functionStates[i - 1] ? 'default' : 'outline'"
+          >
             {{ i - 1 }}
           </Button>
         </div>
       </div>
       <div class="mt-4 flex gap-2">
-        <Button class="size-10" @click="cab.setDirection('reverse', 0)"
-          :variant="cab.state.value.direction === 'reverse' ? 'default' : 'outline'">
+        <Button
+          class="size-10"
+          @click="cab.setDirection('reverse', 0)"
+          :variant="cab.state.value.direction === 'reverse' ? 'default' : 'outline'"
+        >
           <PlayIcon class="rotate-180" />
         </Button>
-        <Button class="size-10" :class="{ 'bg-destructive': cab.state.value.isEmergencyStopped }"
-          @click="cab.setSpeed(0)" :variant="cab.state.value.speed === 0 ? 'default' : 'outline'">
+        <Button
+          class="size-10"
+          :class="{ 'bg-destructive': cab.state.value.isEmergencyStopped }"
+          @click="cab.setSpeed(0)"
+          :variant="cab.state.value.speed === 0 ? 'default' : 'outline'"
+        >
           <PauseIcon />
         </Button>
-        <Button class="size-10" @click="cab.setDirection('forward', 0)"
-          :variant="cab.state.value.direction === 'forward' ? 'default' : 'outline'">
+        <Button
+          class="size-10"
+          @click="cab.setDirection('forward', 0)"
+          :variant="cab.state.value.direction === 'forward' ? 'default' : 'outline'"
+        >
           <PlayIcon />
         </Button>
       </div>
-      <Button class="size-10" :class="{ 'bg-destructive': cab.state.value.isEmergencyStopped }"
-        @click="cab.setSpeed(-1)" :variant="cab.state.value.isEmergencyStopped ? 'default' : 'outline'">
+      <Button
+        class="size-10"
+        :class="{ 'bg-destructive': cab.state.value.isEmergencyStopped }"
+        @click="cab.setSpeed(-1)"
+        :variant="cab.state.value.isEmergencyStopped ? 'default' : 'outline'"
+      >
         <ShieldAlertIcon />
       </Button>
     </Item>

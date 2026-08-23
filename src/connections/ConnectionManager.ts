@@ -2,6 +2,19 @@ import { inject, provide, ref, type InjectionKey, type Ref } from 'vue';
 import type { DccTransport, TransportConnectOptions, TransportId, TransportMap } from './types';
 
 /**
+ * The raw I/O surface a protocol consumer (e.g. `CommandStation`) needs from a connection. It
+ * deliberately exposes nothing about transport orchestration — only send and inbound/reset hooks.
+ */
+export interface ConnectionIo {
+  /** Sends a raw command through the active transport. */
+  send(data: string): Promise<void>;
+  /** Registers the consumer of raw inbound data. Single writer, latest wins. */
+  onData(handler: (data: string) => void): void;
+  /** Registers a hook invoked when the connection stream resets (e.g. transport switch). */
+  onReset(handler: () => void): void;
+}
+
+/**
  * The orchestrator for all transports. Transports are pure I/O adapters registered here; the
  * manager owns which one is the active connection and routes everything through it:
  *
@@ -22,10 +35,17 @@ export class ConnectionManager {
     transport.setDataHandler((data) => this.dataHandler(data));
   }
 
-  /** Assigns the protocol layer that consumes raw data and resets it between transport streams. */
-  setDataHandler(handler: (data: string) => void, resetHandler: () => void = () => {}): void {
-    this.dataHandler = handler;
-    this.dataResetHandler = resetHandler;
+  /** The raw I/O surface handed to the protocol consumer (e.g. the `CommandStation`). */
+  get io(): ConnectionIo {
+    return {
+      send: (data) => this.send(data),
+      onData: (handler) => {
+        this.dataHandler = handler;
+      },
+      onReset: (handler) => {
+        this.dataResetHandler = handler;
+      },
+    };
   }
 
   unregister(id: TransportId) {
@@ -110,12 +130,15 @@ export class ConnectionManager {
 const connectionManagerKey: InjectionKey<ConnectionManager> = Symbol('connection-manager');
 
 /**
- * Provides a `ConnectionManager` for the current component tree. Pass `manager` to override (e.g.
- * a fake in tests).
+ * Provides a `ConnectionManager` for the current component tree. Returns both the manager (for
+ * transport orchestration) and the raw I/O surface (for the protocol consumer, e.g. the
+ * `CommandStation`), so callers can pass only the in/out to whatever decodes the protocol.
  */
-export function provideConnectionManager(manager = new ConnectionManager()): ConnectionManager {
+export function provideConnectionManager(
+  manager = new ConnectionManager(),
+): { manager: ConnectionManager; io: ConnectionIo } {
   provide(connectionManagerKey, manager);
-  return manager;
+  return { manager, io: manager.io };
 }
 
 /** Returns the `ConnectionManager` provided by an ancestor. */

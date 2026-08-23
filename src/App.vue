@@ -14,9 +14,10 @@ import SheetStack from './core/components/AppSheet/SheetStack.vue';
 import Sonner from './core/components/ui/sonner/Sonner.vue';
 
 // Provide the orchestrator and the command-station client, then register the transport adapters.
-// Transports are pure I/O adapters; the CommandStation decodes and dispatches DCC-EX packets.
-const connection = provideConnectionManager();
-const commandStation = provideCommandStation(new CommandStation(connection));
+// Transports are pure I/O adapters; the CommandStation decodes and dispatches DCC-EX packets over
+// the connection's raw I/O surface.
+const { manager: connection, io } = provideConnectionManager();
+const commandStation = provideCommandStation(new CommandStation(io));
 
 const stopCabStateSync = setupCabStateSync(commandStation);
 const stopCommandStationStatusSync = provideCommandStationStatusSync(commandStation);

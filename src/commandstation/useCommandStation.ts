@@ -1,14 +1,14 @@
 import { inject, provide, type InjectionKey } from 'vue';
-import { useConnectionManager } from '@/connections/ConnectionManager';
 import { CommandStation } from './CommandStation';
 
 const commandStationKey: InjectionKey<CommandStation> = Symbol('command-station');
 
 /**
- * Provides a single `CommandStation` for the current component tree, wired to the provided
- * `ConnectionManager`. Pass an override to inject a different station in tests.
+ * Registers a pre-built `CommandStation` for injection into the current component tree. The
+ * caller is responsible for constructing it (e.g. `new CommandStation(io)`), which keeps this
+ * provider free of any dependency on the connection layer and easy to use with a fake in tests.
  */
-export function provideCommandStation(commandStation = new CommandStation(useConnectionManager())): CommandStation {
+export function provideCommandStation(commandStation: CommandStation): CommandStation {
   provide(commandStationKey, commandStation);
   return commandStation;
 }
